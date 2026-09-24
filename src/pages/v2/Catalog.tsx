@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { ProductsTab } from "../../components/catalog/ProductsTab";
-import { CategoriesTab } from "../../components/catalog/CategoriesTab";
-import { BrandsTab } from "../../components/catalog/BrandsTab";
-import { MediaTab } from "../../components/catalog/MediaTab";
 import { FeaturedTab } from "../../components/catalog/FeaturedTab";
 import { SegmentContentTab } from "../../components/catalog/SegmentContentTab";
 
@@ -19,7 +16,7 @@ export function Catalog() {
       </div>
 
       <div className="flex overflow-x-auto gap-6 border-b border-[#e4ece2] mb-6">
-        {["Products", "Categories", "Brands", "Media", "Featured Products", "Segment Content"].map((tab) => (
+        {["Products", "Featured Products", "Segment Content"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -36,9 +33,6 @@ export function Catalog() {
 
       <div className="min-h-[500px]">
         {activeTab === "Products" && <ProductsTab />}
-        {activeTab === "Categories" && <CategoriesTab />}
-        {activeTab === "Brands" && <BrandsTab />}
-        {activeTab === "Media" && <MediaTab />}
         {activeTab === "Featured Products" && <FeaturedTab />}
         {activeTab === "Segment Content" && <SegmentContentTab />}
       </div>
