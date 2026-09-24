@@ -21,6 +21,7 @@ import { DashboardV2 } from "./pages/v2/DashboardV2";
 import { Requests } from "./pages/v2/Requests";
 import { RequestDetail } from "./pages/v2/RequestDetail";
 import { OrdersV2 } from "./pages/v2/OrdersV2";
+import { OrderDetail } from "./pages/v2/OrderDetail";
 import { InventoryV2 } from "./pages/v2/InventoryV2";
 import { Catalog } from "./pages/v2/Catalog";
 import { RolesPermissions } from "./pages/v2/RolesPermissions";
@@ -53,6 +54,7 @@ function App() {
           <Route path="/v2/requests" element={<Requests />} />
           <Route path="/v2/requests/:id" element={<RequestDetail />} />
           <Route path="/v2/orders" element={<OrdersV2 />} />
+          <Route path="/v2/orders/:id" element={<OrderDetail />} />
           <Route path="/v2/inventory" element={<InventoryV2 />} />
           <Route path="/v2/catalog" element={<Catalog />} />
           <Route path="/v2/roles-permissions" element={<RolesPermissions />} />

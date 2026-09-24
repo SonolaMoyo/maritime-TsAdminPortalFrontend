@@ -12,14 +12,14 @@ export function StatusPill({ status, className }: StatusPillProps) {
   
   if (value === "paid" || value === "completed" || value === "delivered" || value === "won") {
     variantClass = "bg-[#eff5ed] text-brand-green"; 
-  } else if (value.includes("unpaid") || value.includes("awaiting") || value.includes("warn") || value.includes("low")) {
-    variantClass = "bg-[#fff1f1] text-[#a11f1f]";
-  } else if (value.includes("failed") || value.includes("cancel") || value.includes("danger") || value === "lost") {
+  } else if (value === "unpaid" || value.includes("failed") || value.includes("cancel") || value.includes("danger") || value === "lost") {
     variantClass = "bg-[#fff1f1] text-[#a11f1f]";
   } else if (value === "new" || value === "assigned") {
     variantClass = "bg-[#f0f4f8] text-[#334e68]"; // blue-gray
-  } else if (value === "contacted" || value === "quote sent" || value === "negotiation") {
+  } else if (value.includes("awaiting") || value.includes("pending") || value === "partially paid" || value === "contacted" || value === "quote sent" || value === "negotiation") {
     variantClass = "bg-[#fff8e6] text-[#996600]"; // yellow-amber
+  } else if (value === "processing" || value === "ready for dispatch" || value === "in transit" || value === "dispatched") {
+    variantClass = "bg-[#e6f0ff] text-[#0055cc]"; // blue
   }
 
   return (
