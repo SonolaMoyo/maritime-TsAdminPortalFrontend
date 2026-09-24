@@ -10,12 +10,16 @@ export function StatusPill({ status, className }: StatusPillProps) {
   
   let variantClass = "bg-[#eff5ed] text-brand-green"; 
   
-  if (value === "paid" || value === "completed" || value === "delivered") {
+  if (value === "paid" || value === "completed" || value === "delivered" || value === "won") {
     variantClass = "bg-[#eff5ed] text-brand-green"; 
   } else if (value.includes("unpaid") || value.includes("awaiting") || value.includes("warn") || value.includes("low")) {
     variantClass = "bg-[#fff1f1] text-[#a11f1f]";
-  } else if (value.includes("failed") || value.includes("cancel") || value.includes("danger")) {
+  } else if (value.includes("failed") || value.includes("cancel") || value.includes("danger") || value === "lost") {
     variantClass = "bg-[#fff1f1] text-[#a11f1f]";
+  } else if (value === "new" || value === "assigned") {
+    variantClass = "bg-[#f0f4f8] text-[#334e68]"; // blue-gray
+  } else if (value === "contacted" || value === "quote sent" || value === "negotiation") {
+    variantClass = "bg-[#fff8e6] text-[#996600]"; // yellow-amber
   }
 
   return (

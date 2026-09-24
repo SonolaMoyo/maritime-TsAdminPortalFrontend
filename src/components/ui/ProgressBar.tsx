@@ -1,4 +1,4 @@
-import { cn } from "../../utils/utils";
+// Removed unused cn import
 
 interface ProgressBarProps {
   label: string;

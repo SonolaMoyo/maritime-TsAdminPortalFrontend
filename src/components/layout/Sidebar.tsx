@@ -1,9 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "../../utils/utils";
 import { LayoutDashboard, ShoppingCart, CreditCard, TrendingUp, Package, Truck, Calendar, Users, Target, LayoutList, FileText, Settings, Inbox, Folder, Shield } from "lucide-react";
+import { useSegment } from "../../context/SegmentContext";
+import type { ExtendedSegmentType } from "../../context/SegmentContext";
 
 export function Sidebar() {
   const navigate = useNavigate();
+  const { segment, setSegment } = useSegment();
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -43,12 +46,16 @@ export function Sidebar() {
 
       <div className="px-4 py-3 border-b border-[#e4ece2]">
         <label className="text-xs font-semibold text-[#8a949d] uppercase tracking-wider mb-1.5 block">Segment:</label>
-        <select className="w-full bg-[#f8faf9] border border-line rounded-lg px-2.5 py-2 text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer">
-          <option value="all">All</option>
-          <option value="solar">Solar Tech</option>
-          <option value="luxe">Luxe</option>
-          <option value="ev">EV</option>
-          <option value="electronics">Electronics</option>
+        <select 
+          value={segment}
+          onChange={(e) => setSegment(e.target.value as ExtendedSegmentType)}
+          className="w-full bg-[#f8faf9] border border-line rounded-lg px-2.5 py-2 text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
+        >
+          <option value="All">All</option>
+          <option value="Solar Tech">Solar Tech</option>
+          <option value="Luxe">Luxe</option>
+          <option value="EV">EV</option>
+          <option value="Electronics">Electronics</option>
         </select>
       </div>
 

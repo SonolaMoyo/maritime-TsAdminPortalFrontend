@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { SegmentProvider } from "./context/SegmentContext";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
@@ -18,6 +19,7 @@ import { Settings } from "./pages/Settings";
 // v2 Pages
 import { DashboardV2 } from "./pages/v2/DashboardV2";
 import { Requests } from "./pages/v2/Requests";
+import { RequestDetail } from "./pages/v2/RequestDetail";
 import { OrdersV2 } from "./pages/v2/OrdersV2";
 import { InventoryV2 } from "./pages/v2/InventoryV2";
 import { Catalog } from "./pages/v2/Catalog";
@@ -26,8 +28,9 @@ import { SystemSettings } from "./pages/v2/SystemSettings";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <SegmentProvider>
+      <BrowserRouter>
+        <Routes>
         <Route path="/login" element={<Login />} />
 
         <Route element={<MainLayout><Outlet /></MainLayout>}>
@@ -48,6 +51,7 @@ function App() {
           {/* v2 Routes */}
           <Route path="/v2/dashboard" element={<DashboardV2 />} />
           <Route path="/v2/requests" element={<Requests />} />
+          <Route path="/v2/requests/:id" element={<RequestDetail />} />
           <Route path="/v2/orders" element={<OrdersV2 />} />
           <Route path="/v2/inventory" element={<InventoryV2 />} />
           <Route path="/v2/catalog" element={<Catalog />} />
@@ -58,6 +62,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </SegmentProvider>
   );
 }
 

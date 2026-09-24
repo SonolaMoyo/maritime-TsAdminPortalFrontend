@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { cn } from "../../utils/utils";
 
 interface TableProps {
@@ -30,17 +30,17 @@ export function Table({ headers, children }: TableProps) {
   );
 }
 
-export function TableRow({ children, className }: { children: ReactNode; className?: string }) {
+export function TableRow({ children, className, onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
   return (
-    <tr className={cn("border-b border-line hover:bg-black/[0.02] transition-colors", className)}>
+    <tr className={cn("border-b border-line hover:bg-black/[0.02] transition-colors", className)} onClick={onClick}>
       {children}
     </tr>
   );
 }
 
-export function TableCell({ children, className }: { children: ReactNode; className?: string }) {
+export function TableCell({ children, className, onClick }: { children: ReactNode; className?: string; onClick?: (e: React.MouseEvent) => void }) {
   return (
-    <td className={cn("py-3.5 px-3.5 align-middle", className)}>
+    <td className={cn("py-3.5 px-3.5 align-middle", className)} onClick={onClick}>
       {children}
     </td>
   );
