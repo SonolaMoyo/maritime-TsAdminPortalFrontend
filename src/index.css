@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f7f9f5;
+  --color-surface: #fff;
+  --color-ink: #07111f;
+  --color-text: #4f5b67;
+  --color-line: #dce5da;
+  --color-brand-green: #005642;
+  --color-brand-green2: #0b6c54;
+  --color-brand-lime: #d2ff2f;
+  --color-brand-lime2: #9ef160;
+  --color-brand-orange: #f29a3b;
+  --color-brand-deep: #00251f;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+  }
+}
