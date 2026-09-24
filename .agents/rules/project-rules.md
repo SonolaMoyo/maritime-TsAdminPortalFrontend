@@ -15,3 +15,6 @@ When working on this project (`TsAdminPortalFrontend`), ALWAYS adhere to the fol
    - Create sufficient files and directories to enforce strict separation of concerns.
    - Keep components focused on a single responsibility.
    - Extract logic into custom hooks, utility functions, or service files rather than bloating UI components.
+
+4. **Frontend Theme**:
+   - Ensure to use the existing frontend theme.

@@ -15,6 +15,15 @@ import { Products } from "./pages/Products";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 
+// v2 Pages
+import { DashboardV2 } from "./pages/v2/DashboardV2";
+import { Requests } from "./pages/v2/Requests";
+import { OrdersV2 } from "./pages/v2/OrdersV2";
+import { InventoryV2 } from "./pages/v2/InventoryV2";
+import { Catalog } from "./pages/v2/Catalog";
+import { RolesPermissions } from "./pages/v2/RolesPermissions";
+import { SystemSettings } from "./pages/v2/SystemSettings";
+
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +44,15 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+
+          {/* v2 Routes */}
+          <Route path="/v2/dashboard" element={<DashboardV2 />} />
+          <Route path="/v2/requests" element={<Requests />} />
+          <Route path="/v2/orders" element={<OrdersV2 />} />
+          <Route path="/v2/inventory" element={<InventoryV2 />} />
+          <Route path="/v2/catalog" element={<Catalog />} />
+          <Route path="/v2/roles-permissions" element={<RolesPermissions />} />
+          <Route path="/v2/system-settings" element={<SystemSettings />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
