@@ -3,10 +3,12 @@ import { inventoryService } from "../../services/inventoryService";
 import type { InventoryTransfer } from "../../data/mockInventory";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { ArrowRight } from "lucide-react";
+import { Modal } from "../ui/Modal";
 
 export function TransfersTab() {
   const [transfers, setTransfers] = useState<InventoryTransfer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTransfer, setSelectedTransfer] = useState<InventoryTransfer | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,7 +53,7 @@ export function TransfersTab() {
                 </div>
               </TableCell>
               <TableCell>
-                <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
+                <button onClick={() => setSelectedTransfer(trf)} className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
                   View
                 </button>
               </TableCell>
@@ -64,6 +66,50 @@ export function TransfersTab() {
           )}
         </Table>
       )}
+
+      {/* View Transfer Modal */}
+      <Modal isOpen={!!selectedTransfer} onClose={() => setSelectedTransfer(null)} title="Transfer Details">
+        {selectedTransfer && (
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-bold text-ink text-lg">{selectedTransfer.transferNumber}</h4>
+              <p className="text-[#8a949d] text-sm">Product: {selectedTransfer.productName} ({selectedTransfer.productId})</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-[#fcfdfa] border border-line rounded-lg">
+                <div className="text-[12px] font-bold text-[#8a949d] uppercase mb-1">Origin</div>
+                <div className="text-[14px] font-bold text-ink">{selectedTransfer.fromWarehouseId === "wh-1" ? "Lagos Warehouse" : "Abuja Hub"}</div>
+              </div>
+              <div className="p-3 bg-[#fcfdfa] border border-line rounded-lg">
+                <div className="text-[12px] font-bold text-[#8a949d] uppercase mb-1">Destination</div>
+                <div className="text-[14px] font-bold text-ink">{selectedTransfer.toWarehouseId === "wh-1" ? "Lagos Warehouse" : "Abuja Hub"}</div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-[#fcfdfa] border border-line rounded-lg">
+                <div className="text-[12px] font-bold text-[#8a949d] uppercase mb-1">Quantity Transferred</div>
+                <div className="text-xl font-black text-ink">{selectedTransfer.quantity}</div>
+              </div>
+              <div className="p-3 bg-[#fcfdfa] border border-line rounded-lg">
+                <div className="text-[12px] font-bold text-[#8a949d] uppercase mb-1">Status</div>
+                <div className={`mt-1 px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
+                  selectedTransfer.status === 'Completed' ? 'bg-[#f4fce3] text-[#65a30d]' :
+                  selectedTransfer.status === 'In Transit' ? 'bg-[#eff6ff] text-[#3b82f6]' :
+                  'bg-[#fffbeb] text-[#f59e0b]'
+                }`}>
+                  {selectedTransfer.status}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-line flex justify-end">
+              <button onClick={() => setSelectedTransfer(null)} className="px-4 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2">Close</button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

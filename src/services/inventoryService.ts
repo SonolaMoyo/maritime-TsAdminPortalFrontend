@@ -121,6 +121,71 @@ class InventoryService {
     
     return newTransfer;
   }
+  async addProduct(product: Partial<ProductInventory>): Promise<ProductInventory> {
+    await delay(300);
+    const newProduct: ProductInventory = {
+      id: `inv-${Date.now()}`,
+      productId: `prod-${Date.now()}`,
+      productName: product.productName || "New Product",
+      segment: product.segment || "Solar Tech",
+      warehouseId: product.warehouseId || "wh-1",
+      quantity: product.quantity || 0,
+      allocatedQuantity: 0,
+      availableQuantity: product.quantity || 0,
+      reorderThreshold: product.reorderThreshold || 10,
+      status: product.quantity ? "Healthy" : "Out of Stock",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.inventory = [newProduct, ...this.inventory];
+    return newProduct;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    await delay(300);
+    this.inventory = this.inventory.filter(i => i.id !== id);
+  }
+
+  async addWarehouse(warehouse: Partial<Warehouse>): Promise<Warehouse> {
+    await delay(300);
+    const newWh: Warehouse = {
+      id: `wh-${Date.now()}`,
+      name: warehouse.name || "New Warehouse",
+      location: warehouse.location || "Unknown",
+      address: warehouse.address || "",
+      manager: warehouse.manager || "Unassigned",
+      status: warehouse.status || "Active",
+      createdAt: new Date().toISOString()
+    };
+    this.warehouses = [newWh, ...this.warehouses];
+    return newWh;
+  }
+
+  async deleteWarehouse(id: string): Promise<void> {
+    await delay(300);
+    this.warehouses = this.warehouses.filter(w => w.id !== id);
+  }
+
+  async addSupplier(supplier: Partial<Supplier>): Promise<Supplier> {
+    await delay(300);
+    const newSup: Supplier = {
+      id: `sup-${Date.now()}`,
+      name: supplier.name || "New Supplier",
+      contactPerson: supplier.contactPerson || "Unknown",
+      email: supplier.email || "",
+      phone: supplier.phone || "",
+      productsSupplied: 0,
+      activeOrders: 0,
+      status: supplier.status || "Active"
+    };
+    this.suppliers = [newSup, ...this.suppliers];
+    return newSup;
+  }
+
+  async deleteSupplier(id: string): Promise<void> {
+    await delay(300);
+    this.suppliers = this.suppliers.filter(s => s.id !== id);
+  }
 }
 
 export const inventoryService = new InventoryService();

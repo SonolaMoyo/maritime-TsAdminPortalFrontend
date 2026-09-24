@@ -49,11 +49,10 @@ export function OverviewTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
         <MetricCard title="Total Products" value={totalProducts} subtitle="Active SKUs" />
         <MetricCard title="Total Stock" value={`${totalStock.toLocaleString()} units`} subtitle="Across warehouses" variant="lime" />
         <MetricCard title="Low Stock" value={lowStockCount} subtitle="Requires attention" />
-        <MetricCard title="Incoming" value="4,250 units" subtitle="Expected this week" />
         <MetricCard title="Allocated" value={`${allocatedStock.toLocaleString()} units`} subtitle="Reserved for orders" />
       </div>
 
