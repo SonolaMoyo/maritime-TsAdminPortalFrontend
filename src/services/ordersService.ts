@@ -16,6 +16,44 @@ class OrdersService {
     return this.orders.find(o => o.id === id);
   }
 
+  async createOrder(data: Partial<Order>): Promise<Order> {
+    await delay(400);
+    const newOrder: Order = {
+      id: `ord-${Date.now()}`,
+      orderNumber: `ORD-00${Math.floor(Math.random() * 10000)}`,
+      customerName: data.customerName || "Unknown",
+      companyName: data.companyName || "",
+      email: data.email || "",
+      phone: data.phone || "",
+      segment: data.segment || "Solar Tech",
+      status: "Pending Approval",
+      items: data.items || [],
+      subtotal: data.subtotal || 0,
+      discount: data.discount || 0,
+      deliveryFee: data.deliveryFee || 0,
+      totalAmount: data.totalAmount || 0,
+      payment: {
+        status: "Unpaid",
+        amountDue: data.totalAmount || 0,
+        amountPaid: 0
+      },
+      delivery: {
+        status: "Pending",
+        location: data.delivery?.location || "",
+        address: data.delivery?.address || ""
+      },
+      activities: [
+        { id: `act-${Date.now()}`, date: new Date().toISOString(), actor: "System", type: "Order Created", description: "Order created manually" }
+      ],
+      notes: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    this.orders = [newOrder, ...this.orders];
+    return newOrder;
+  }
+
   async addActivity(orderId: string, type: string, description: string, actor: string = "Operations User"): Promise<Order> {
     await delay(300);
     const index = this.orders.findIndex(o => o.id === orderId);
