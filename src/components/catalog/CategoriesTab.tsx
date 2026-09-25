@@ -5,10 +5,10 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 
-export function CategoriesTab() {
+export function ]() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", segment: "Solar Tech" as any, status: "Active" as any });
 
@@ -50,9 +50,8 @@ export function CategoriesTab() {
               </TableCell>
               <TableCell><div className="font-black text-ink">{cat.productCount}</div></TableCell>
               <TableCell>
-                <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
-                  cat.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
-                }`}>
+                <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${cat.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
+                  }`}>
                   {cat.status}
                 </div>
               </TableCell>
@@ -75,11 +74,11 @@ export function CategoriesTab() {
         <form onSubmit={handleAdd} className="space-y-4">
           <div>
             <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Category Name *</label>
-            <input required value={addForm.name} onChange={e => setAddForm({...addForm, name: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
+            <input required value={addForm.name} onChange={e => setAddForm({ ...addForm, name: e.target.value })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
           </div>
           <div>
             <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
-            <select value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as any})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
+            <select value={addForm.segment} onChange={e => setAddForm({ ...addForm, segment: e.target.value as any })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
               <option value="Solar Tech">Solar Tech</option>
               <option value="Luxe">Luxe</option>
               <option value="EV">EV</option>
@@ -88,7 +87,7 @@ export function CategoriesTab() {
           </div>
           <div>
             <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Status</label>
-            <select value={addForm.status} onChange={e => setAddForm({...addForm, status: e.target.value as any})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
+            <select value={addForm.status} onChange={e => setAddForm({ ...addForm, status: e.target.value as any })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
