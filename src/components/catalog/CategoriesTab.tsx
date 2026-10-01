@@ -5,7 +5,7 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 
-export function ]() {
+export function CategoriesTab() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
