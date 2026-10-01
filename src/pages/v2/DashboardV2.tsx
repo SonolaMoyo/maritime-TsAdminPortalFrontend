@@ -301,16 +301,16 @@ export function DashboardV2() {
       {/* Executive Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-brand-green mb-1.5">
+          {/* <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-brand-green mb-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-brand-green animate-pulse" />
             Executive Operational Overview
-          </div>
+          </div> */}
           <h1 className="text-3xl font-black text-ink tracking-tight">
             Dashboard {segment !== "All" && <span className="text-brand-green">— {segment}</span>}
           </h1>
-          <p className="text-[#5b6671] text-[15px] font-medium mt-1">
+          {/* <p className="text-[#5b6671] text-[15px] font-medium mt-1">
             Real-time movement and performance summary across the four primary pillars of Maritama Trading.
-          </p>
+          </p> */}
         </div>
 
         {/* Time Adjuster Bar (Month & Year Filter) */}
@@ -355,7 +355,7 @@ export function DashboardV2() {
       </div>
 
       {/* Active Filter Period Indicator Banner */}
-      <div className="bg-[#eff5ed] border border-[#d2ff2f]/50 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs font-bold text-brand-green">
+      {/* <div className="bg-[#eff5ed] border border-[#d2ff2f]/50 px-4 py-2.5 rounded-xl flex items-center justify-between text-xs font-bold text-brand-green">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-brand-green" />
           <span>
@@ -365,7 +365,7 @@ export function DashboardV2() {
         <span className="text-[#5b6671] font-semibold">
           Click any feature card to view full operational details
         </span>
-      </div>
+      </div> */}
 
       {/* 4 Major Features Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
