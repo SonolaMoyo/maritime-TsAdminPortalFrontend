@@ -158,7 +158,7 @@ export function OrderDetail() {
       {/* Header & Nav */}
       <div className="mb-6">
         <button 
-          onClick={() => navigate('/v2/orders')} 
+          onClick={() => navigate('/orders')} 
           className="flex items-center gap-2 text-[#5b6671] text-sm font-bold hover:text-ink transition-colors mb-4 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Orders

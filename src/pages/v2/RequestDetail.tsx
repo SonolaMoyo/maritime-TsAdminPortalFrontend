@@ -115,7 +115,7 @@ export function RequestDetail() {
       {/* Top Header */}
       <div className="mb-6">
         <button 
-          onClick={() => navigate('/v2/requests')} 
+          onClick={() => navigate('/requests')} 
           className="flex items-center gap-2 text-[#5b6671] text-sm font-bold hover:text-ink transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Requests

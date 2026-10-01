@@ -372,7 +372,7 @@ export function DashboardV2() {
 
         {/* 1. ORDERS CARD & GRAPH */}
         <div 
-          onClick={() => navigate('/v2/orders')}
+          onClick={() => navigate('/orders')}
           className="group cursor-pointer"
         >
           <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
@@ -393,7 +393,7 @@ export function DashboardV2() {
                 </div>
 
                 <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/v2/orders'); }}
+                  onClick={(e) => { e.stopPropagation(); navigate('/orders'); }}
                   className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <span>Open Orders</span>
@@ -447,7 +447,7 @@ export function DashboardV2() {
 
         {/* 2. REQUESTS CARD & GRAPH */}
         <div 
-          onClick={() => navigate('/v2/requests')}
+          onClick={() => navigate('/requests')}
           className="group cursor-pointer"
         >
           <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
@@ -468,7 +468,7 @@ export function DashboardV2() {
                 </div>
 
                 <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/v2/requests'); }}
+                  onClick={(e) => { e.stopPropagation(); navigate('/requests'); }}
                   className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <span>Open Requests</span>
@@ -522,7 +522,7 @@ export function DashboardV2() {
 
         {/* 3. INVENTORY CARD & GRAPH */}
         <div 
-          onClick={() => navigate('/v2/inventory')}
+          onClick={() => navigate('/inventory')}
           className="group cursor-pointer"
         >
           <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
@@ -543,7 +543,7 @@ export function DashboardV2() {
                 </div>
 
                 <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/v2/inventory'); }}
+                  onClick={(e) => { e.stopPropagation(); navigate('/inventory'); }}
                   className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <span>Open Inventory</span>
@@ -597,7 +597,7 @@ export function DashboardV2() {
 
         {/* 4. CATALOG CARD & GRAPH */}
         <div 
-          onClick={() => navigate('/v2/catalog')}
+          onClick={() => navigate('/catalog')}
           className="group cursor-pointer"
         >
           <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
@@ -618,7 +618,7 @@ export function DashboardV2() {
                 </div>
 
                 <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/v2/catalog'); }}
+                  onClick={(e) => { e.stopPropagation(); navigate('/catalog'); }}
                   className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <span>Open Catalog</span>
@@ -673,7 +673,7 @@ export function DashboardV2() {
       </div>
 
       {/* Quick Direct Navigation Bar */}
-      <div className="bg-white border border-line rounded-2xl p-5 shadow-sm">
+      {/* <div className="bg-white border border-line rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-black text-[#8a949d] uppercase tracking-wider">
             Direct Operations Navigation
@@ -683,7 +683,7 @@ export function DashboardV2() {
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button
-            onClick={() => navigate('/v2/orders')}
+            onClick={() => navigate('/orders')}
             className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
           >
             <div>
@@ -694,7 +694,7 @@ export function DashboardV2() {
           </button>
 
           <button
-            onClick={() => navigate('/v2/requests')}
+            onClick={() => navigate('/requests')}
             className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
           >
             <div>
@@ -705,7 +705,7 @@ export function DashboardV2() {
           </button>
 
           <button
-            onClick={() => navigate('/v2/inventory')}
+            onClick={() => navigate('/inventory')}
             className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
           >
             <div>
@@ -716,7 +716,7 @@ export function DashboardV2() {
           </button>
 
           <button
-            onClick={() => navigate('/v2/catalog')}
+            onClick={() => navigate('/catalog')}
             className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
           >
             <div>
@@ -726,7 +726,7 @@ export function DashboardV2() {
             <ChevronRight className="w-4 h-4 text-[#8a949d] group-hover:text-brand-green group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

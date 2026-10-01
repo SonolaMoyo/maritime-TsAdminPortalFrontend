@@ -324,7 +324,7 @@ export function OrdersV2() {
               const isAllocated = totalAllocated >= totalItems;
 
               return (
-                <TableRow key={order.id} className="cursor-pointer hover:bg-[#fcfdfa] transition-colors" onClick={() => navigate(`/v2/orders/${order.id}`)}>
+                <TableRow key={order.id} className="cursor-pointer hover:bg-[#fcfdfa] transition-colors" onClick={() => navigate(`/orders/${order.id}`)}>
                   <TableCell>
                     <div className="font-bold text-ink text-[14px]">{order.orderNumber}</div>
                     <div className="text-[11px] font-bold text-[#8a949d]">Prepaid</div>
@@ -384,7 +384,7 @@ export function OrdersV2() {
 
                   <TableCell>
                     <button 
-                      onClick={(e) => { e.stopPropagation(); navigate(`/v2/orders/${order.id}`); }}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order.id}`); }}
                       className="inline-flex items-center gap-1 text-[13px] font-[800] text-brand-green hover:text-brand-green2 hover:underline cursor-pointer"
                     >
                       Manage <ArrowRight className="w-3.5 h-3.5" />

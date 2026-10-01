@@ -152,7 +152,7 @@ export function Requests() {
         ) : (
           <Table headers={["Request ID", "Customer", "Product", "Segment", "Quantity", "Date", "Owner", "Status", "Action"]}>
             {finalFiltered.map((req) => (
-              <TableRow key={req.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/v2/requests/${req.id}`)}>
+              <TableRow key={req.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/requests/${req.id}`)}>
                 <TableCell>
                   <div className="font-bold text-ink">{req.requestNumber}</div>
                 </TableCell>

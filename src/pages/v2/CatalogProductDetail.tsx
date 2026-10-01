@@ -47,7 +47,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
           setDocs(prod.docs);
           setStock(prod.stock || 0);
         } else {
-          navigate("/v2/catalog");
+          navigate("/catalog");
         }
       }
       setLoading(false);
@@ -59,11 +59,11 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
     const dataToSave = { ...form, status };
     if (isNew) {
       await catalogService.addProduct(dataToSave as any);
-      navigate("/v2/catalog");
+      navigate("/catalog");
     } else if (id) {
       await catalogService.updateProduct(id, dataToSave as any);
       // For a real app, we'd also save specs, images, docs.
-      navigate("/v2/catalog");
+      navigate("/catalog");
     }
   };
 
@@ -83,7 +83,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
     <div className="p-6 max-w-[1000px] mx-auto w-full pb-24">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate("/v2/catalog")} className="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:bg-[#fcfdfa] text-ink transition-colors">
+        <button onClick={() => navigate("/catalog")} className="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:bg-[#fcfdfa] text-ink transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
@@ -244,7 +244,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
           <section className="bg-white border border-line rounded-2xl p-6 shadow-sm">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-line">
               <h2 className="text-[16px] font-bold text-ink">6. Inventory Overview</h2>
-              <button onClick={() => navigate("/v2/inventory")} className="text-[13px] font-bold text-brand-green hover:underline">Manage in Inventory →</button>
+              <button onClick={() => navigate("/inventory")} className="text-[13px] font-bold text-brand-green hover:underline">Manage in Inventory →</button>
             </div>
             <div className="flex items-center gap-8">
               <div>

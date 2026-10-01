@@ -51,7 +51,7 @@ export function ProductsTab() {
           />
         </div>
         <button 
-          onClick={() => navigate('/v2/catalog/products/new')}
+          onClick={() => navigate('/catalog/products/new')}
           className="px-4 py-2 bg-brand-green text-white text-[13px] font-bold rounded-lg flex items-center gap-2 hover:bg-brand-green2"
         >
           <Plus className="w-4 h-4" /> Add Product
@@ -66,7 +66,7 @@ export function ProductsTab() {
             const cat = categories.find(c => c.id === prod.categoryId);
             const brand = brands.find(b => b.id === prod.brandId);
             return (
-              <TableRow key={prod.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/v2/catalog/products/${prod.id}`)}>
+              <TableRow key={prod.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/catalog/products/${prod.id}`)}>
                 <TableCell>
                   <div className="font-bold text-ink text-[14px]">{prod.name}</div>
                   <div className="text-[12px] text-[#8a949d] font-medium">SKU: {prod.id}</div>

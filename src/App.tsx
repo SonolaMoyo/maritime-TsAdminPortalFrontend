@@ -2,21 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import { SegmentProvider } from "./context/SegmentContext";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Login } from "./pages/Login";
-import { Dashboard } from "./pages/Dashboard";
-import { Orders } from "./pages/Orders";
-import { Payments } from "./pages/Payments";
-import { Sales } from "./pages/Sales";
-import { Inventory } from "./pages/Inventory";
-import { Distribution } from "./pages/Distribution";
-import { Deliveries } from "./pages/Deliveries";
-import { Schedule } from "./pages/Schedule";
-import { Clients } from "./pages/Clients";
-import { Referrals } from "./pages/Referrals";
-import { Products } from "./pages/Products";
-import { Reports } from "./pages/Reports";
-import { Settings } from "./pages/Settings";
 
-// v2 Pages
+// Primary Portal Pages (V2 Architecture)
 import { DashboardV2 } from "./pages/v2/DashboardV2";
 import { Requests } from "./pages/v2/Requests";
 import { RequestDetail } from "./pages/v2/RequestDetail";
@@ -33,40 +20,40 @@ function App() {
     <SegmentProvider>
       <BrowserRouter>
         <Routes>
-        <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
 
-        <Route element={<MainLayout><Outlet /></MainLayout>}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/payments" element={<Payments />} />
-          <Route path="/sales" element={<Sales />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/distribution" element={<Distribution />} />
-          <Route path="/deliveries" element={<Deliveries />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/referrals" element={<Referrals />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route element={<MainLayout><Outlet /></MainLayout>}>
+            {/* Primary Clean Routes */}
+            <Route path="/" element={<DashboardV2 />} />
+            <Route path="/dashboard" element={<DashboardV2 />} />
+            <Route path="/requests" element={<Requests />} />
+            <Route path="/requests/:id" element={<RequestDetail />} />
+            <Route path="/orders" element={<OrdersV2 />} />
+            <Route path="/orders/:id" element={<OrderDetail />} />
+            <Route path="/inventory" element={<InventoryV2 />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/catalog/products/new" element={<CatalogProductDetail isNew={true} />} />
+            <Route path="/catalog/products/:id" element={<CatalogProductDetail />} />
+            <Route path="/roles-permissions" element={<RolesPermissions />} />
+            <Route path="/system-settings" element={<SystemSettings />} />
 
-          {/* v2 Routes */}
-          <Route path="/v2/dashboard" element={<DashboardV2 />} />
-          <Route path="/v2/requests" element={<Requests />} />
-          <Route path="/v2/requests/:id" element={<RequestDetail />} />
-          <Route path="/v2/orders" element={<OrdersV2 />} />
-          <Route path="/v2/orders/:id" element={<OrderDetail />} />
-          <Route path="/v2/inventory" element={<InventoryV2 />} />
-          <Route path="/v2/catalog" element={<Catalog />} />
-          <Route path="/v2/catalog/products/new" element={<CatalogProductDetail isNew={true} />} />
-          <Route path="/v2/catalog/products/:id" element={<CatalogProductDetail />} />
-          <Route path="/v2/roles-permissions" element={<RolesPermissions />} />
-          <Route path="/v2/system-settings" element={<SystemSettings />} />
-        </Route>
+            {/* Backwards-compatible /v2/ aliases */}
+            <Route path="/v2/dashboard" element={<DashboardV2 />} />
+            <Route path="/v2/requests" element={<Requests />} />
+            <Route path="/v2/requests/:id" element={<RequestDetail />} />
+            <Route path="/v2/orders" element={<OrdersV2 />} />
+            <Route path="/v2/orders/:id" element={<OrderDetail />} />
+            <Route path="/v2/inventory" element={<InventoryV2 />} />
+            <Route path="/v2/catalog" element={<Catalog />} />
+            <Route path="/v2/catalog/products/new" element={<CatalogProductDetail isNew={true} />} />
+            <Route path="/v2/catalog/products/:id" element={<CatalogProductDetail />} />
+            <Route path="/v2/roles-permissions" element={<RolesPermissions />} />
+            <Route path="/v2/system-settings" element={<SystemSettings />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
     </SegmentProvider>
   );
 }

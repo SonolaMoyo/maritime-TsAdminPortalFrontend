@@ -13,14 +13,14 @@ export function Topbar() {
       </label>
 
       <div className="flex gap-2 overflow-x-auto pb-0.5 px-2">
-        {["All branches", "Lagos Office", "Abuja Branch", "Port Harcourt", "Online Orders"].map((branch, i) => (
+        {/* {["All branches", "Lagos Office", "Abuja Branch", "Port Harcourt", "Online Orders"].map((branch, i) => (
           <button 
             key={branch}
             className={`h-[34px] border border-[#dce5da] rounded-full px-3.5 font-[800] text-[13px] whitespace-nowrap cursor-pointer ${i === 0 ? "bg-brand-green text-white border-brand-green" : "bg-white text-[#52606b]"}`}
           >
             {branch}
           </button>
-        ))}
+        ))} */}
       </div>
 
       <div className="flex items-center gap-3 text-[#66727b] font-[750] whitespace-nowrap text-sm pr-4">
@@ -30,7 +30,7 @@ export function Topbar() {
             2
           </i>
         </span>
-        <span>Demo Admin · Administrator</span>
+        <span>Admin · Administrator</span>
       </div>
     </header>
   );
