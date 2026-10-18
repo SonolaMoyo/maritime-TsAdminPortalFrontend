@@ -1,13 +1,28 @@
-import { Lock } from "lucide-react";
+import { useState } from "react";
+import { Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 
 export function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("admin@maritamatrading.com");
+  const [password, setPassword] = useState("Admin@123456");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would authenticate here. For now, just navigate to the dashboard.
-    navigate("/");
+    setLoading(true);
+    setError(null);
+    try {
+      await authService.login(email, password);
+      navigate("/");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Authentication failed";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,6 +36,12 @@ export function Login() {
         <h1 className="text-3xl font-black tracking-tight text-ink mb-2">Welcome back</h1>
         <p className="text-text mb-8">Sign in to the Maritama Trading Operations Portal.</p>
         
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium text-left">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-4 text-left">
           <div>
             <label className="block text-sm font-bold text-ink mb-1.5" htmlFor="email">Email</label>
@@ -28,6 +49,8 @@ export function Login() {
               id="email"
               type="email" 
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@maritamatrading.com"
               className="w-full h-12 px-4 rounded-xl border border-[#dce5da] bg-bg focus:bg-white focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
             />
@@ -42,6 +65,8 @@ export function Login() {
               id="password"
               type="password" 
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="w-full h-12 px-4 rounded-xl border border-[#dce5da] bg-bg focus:bg-white focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
             />
@@ -49,9 +74,10 @@ export function Login() {
           
           <button 
             type="submit"
-            className="w-full h-12 mt-2 rounded-xl bg-brand-green text-white font-black hover:-translate-y-0.5 transition-transform shadow-[0_12px_24px_rgba(0,86,66,0.22)] cursor-pointer"
+            disabled={loading}
+            className="w-full h-12 mt-2 rounded-xl bg-brand-green text-white font-black hover:-translate-y-0.5 transition-transform shadow-[0_12px_24px_rgba(0,86,66,0.22)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Sign In
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
           </button>
         </form>
         
