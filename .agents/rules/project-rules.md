@@ -18,3 +18,6 @@ When working on this project (`TsAdminPortalFrontend`), ALWAYS adhere to the fol
 
 4. **Frontend Theme**:
    - Ensure to use the existing frontend theme.
+
+5. **API Requirement Synchronization (`APIs.md`)**:
+   - Whenever subsequent frontend implementations introduce, modify, or deprecate API interactions, endpoints, query parameters (e.g. pagination, sorting, filters), request payloads, or response models, you MUST update `APIs.md` to keep the backend API specifications strictly synchronized and up to date.
