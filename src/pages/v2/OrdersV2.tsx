@@ -153,14 +153,14 @@ export function OrdersV2() {
   });
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto w-full">
+    <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-ink mb-1">
             Orders {segment !== 'All' && <span className="text-brand-green">— {segment}</span>}
           </h1>
-          <p className="text-[#5b6671] text-[15px] font-medium">
+          <p className="text-[#5b6671] text-xs sm:text-[15px] font-medium">
             Manage confirmed & paid orders through inventory allocation, staging, dispatch, and final delivery.
           </p>
         </div>
@@ -172,7 +172,7 @@ export function OrdersV2() {
             }));
             setIsAddModalOpen(true);
           }}
-          className="h-[44px] px-5 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 hover:-translate-y-0.5 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+          className="h-[44px] px-5 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 hover:-translate-y-0.5 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
           Create Order
@@ -180,7 +180,7 @@ export function OrdersV2() {
       </div>
 
       {/* Operational Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4">
         <MetricCard 
           title="Total Order Revenue" 
           value={`₦${stats.totalRevenue.toLocaleString()}`} 
@@ -196,7 +196,7 @@ export function OrdersV2() {
       </div>
 
       {/* Pipeline Stage Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-6 sm:mb-8">
         <div 
           onClick={() => setActiveTab("All")}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
@@ -292,20 +292,20 @@ export function OrdersV2() {
           })}
         </div>
         
-        <div className="flex gap-3">
-          <div className="relative">
+        <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a949d]" />
             <input 
               type="text" 
-              placeholder="Search by ID, client, payment ref..." 
+              placeholder="Search by ID, client..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[13px] font-medium text-ink w-[260px] focus:outline-none focus:border-brand-green transition-colors"
+              className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[13px] font-medium text-ink w-full sm:w-[260px] focus:outline-none focus:border-brand-green transition-colors"
             />
           </div>
-          <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[13px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer">
+          <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[13px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer flex-shrink-0">
             <Filter className="w-4 h-4" />
-            Filters
+            <span className="hidden xs:inline">Filters</span>
           </button>
         </div>
       </div>
@@ -417,7 +417,7 @@ export function OrdersV2() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Customer Name *</label>
               <input required type="text" value={addForm.customerName} onChange={e => setAddForm({...addForm, customerName: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. Adeola Adeleke" />
@@ -438,7 +438,7 @@ export function OrdersV2() {
           
           <hr className="border-line my-2" />
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
               <select required value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as SegmentType})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
@@ -470,7 +470,7 @@ export function OrdersV2() {
           <hr className="border-line my-2" />
 
           {/* Payment & Delivery Details */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Method *</label>
               <select value={addForm.paymentMethod} onChange={e => setAddForm({...addForm, paymentMethod: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
@@ -495,11 +495,11 @@ export function OrdersV2() {
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">
+          <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">
               Cancel
             </button>
-            <button type="submit" disabled={isAdding} className="px-5 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+            <button type="submit" disabled={isAdding} className="w-full sm:w-auto px-5 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
               <PackageCheck className="w-4 h-4" />
               {isAdding ? "Queuing Order..." : "Confirm & Move to Processing"}
             </button>

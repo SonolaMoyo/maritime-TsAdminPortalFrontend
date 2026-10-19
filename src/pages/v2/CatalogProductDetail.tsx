@@ -80,33 +80,35 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
   }
 
   return (
-    <div className="p-6 max-w-[1000px] mx-auto w-full pb-24">
+    <div className="p-4 sm:p-6 max-w-[1000px] mx-auto w-full pb-24">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate("/catalog")} className="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:bg-[#fcfdfa] text-ink transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-black text-ink">{isNew ? "Create Product" : form.name}</h1>
-          <p className="text-[#8a949d] text-[14px] font-medium mt-1">
-            {isNew ? "Create a product that will appear on the public website." : `${form.segment} / ${categories.find(c => c.id === form.categoryId)?.name || 'Uncategorized'} / ${brands.find(b => b.id === form.brandId)?.name || 'No Brand'}`}
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+          <button onClick={() => navigate("/catalog")} className="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:bg-[#fcfdfa] text-ink transition-colors flex-shrink-0 cursor-pointer">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black text-ink truncate">{isNew ? "Create Product" : form.name}</h1>
+            <p className="text-[#8a949d] text-xs sm:text-[14px] font-medium mt-0.5 truncate">
+              {isNew ? "Create a product that will appear on the public website." : `${form.segment} / ${categories.find(c => c.id === form.categoryId)?.name || 'Uncategorized'} / ${brands.find(b => b.id === form.brandId)?.name || 'No Brand'}`}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => handleSave('Draft')} className="px-5 py-2.5 rounded-full border border-line text-[14px] font-bold text-ink hover:bg-[#fcfdfa] transition-colors">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <button onClick={() => handleSave('Draft')} className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-full border border-line text-[13px] sm:text-[14px] font-bold text-ink hover:bg-[#fcfdfa] transition-colors cursor-pointer text-center">
             Save Draft
           </button>
-          <button onClick={() => handleSave('Published')} className="px-5 py-2.5 rounded-full bg-brand-green text-white text-[14px] font-bold flex items-center gap-2 hover:bg-brand-green2 transition-colors">
+          <button onClick={() => handleSave('Published')} className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-full bg-brand-green text-white text-[13px] sm:text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-brand-green2 transition-colors cursor-pointer">
             <Save className="w-4 h-4" /> Publish
           </button>
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* 1. Basic Info */}
-        <section className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-          <h2 className="text-[16px] font-bold text-ink mb-6 pb-4 border-b border-line">1. Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section className="bg-white border border-line rounded-2xl p-4 sm:p-6 shadow-sm">
+          <h2 className="text-[15px] sm:text-[16px] font-bold text-ink mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-line">1. Basic Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div className="md:col-span-2">
               <label className="block text-[13px] font-bold text-ink mb-2">Product Name *</label>
               <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green" />
@@ -182,23 +184,23 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
         </section>
 
         {/* 4. Specifications */}
-        <section className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+        <section className="bg-white border border-line rounded-2xl p-4 sm:p-6 shadow-sm">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-line">
             <h2 className="text-[16px] font-bold text-ink">4. Specifications</h2>
-            <button onClick={handleAddSpec} className="text-[13px] font-bold text-brand-green flex items-center gap-1 hover:underline">
+            <button onClick={handleAddSpec} className="text-[13px] font-bold text-brand-green flex items-center gap-1 hover:underline cursor-pointer">
               <Plus className="w-4 h-4" /> Add Spec
             </button>
           </div>
           <div className="space-y-3">
             {specs.map((spec, index) => (
-              <div key={index} className="flex gap-3 items-start">
-                <div className="flex-1 grid grid-cols-4 gap-3">
-                  <input value={spec.groupName} onChange={e => { const s = [...specs]; s[index].groupName = e.target.value; setSpecs(s); }} placeholder="Group (e.g. Electrical)" className="w-full border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-brand-green" />
-                  <input value={spec.name} onChange={e => { const s = [...specs]; s[index].name = e.target.value; setSpecs(s); }} placeholder="Name (e.g. Voltage)" className="w-full border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-brand-green" />
-                  <input value={spec.value} onChange={e => { const s = [...specs]; s[index].value = e.target.value; setSpecs(s); }} placeholder="Value (e.g. 220)" className="w-full border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-brand-green" />
-                  <input value={spec.unit} onChange={e => { const s = [...specs]; s[index].unit = e.target.value; setSpecs(s); }} placeholder="Unit (e.g. V)" className="w-full border border-line rounded-lg px-3 py-2 text-[13px] focus:outline-brand-green" />
+              <div key={index} className="flex gap-2 sm:gap-3 items-start">
+                <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                  <input value={spec.groupName} onChange={e => { const s = [...specs]; s[index].groupName = e.target.value; setSpecs(s); }} placeholder="Group (e.g. Electrical)" className="w-full border border-line rounded-lg px-2.5 sm:px-3 py-2 text-[12px] sm:text-[13px] focus:outline-brand-green" />
+                  <input value={spec.name} onChange={e => { const s = [...specs]; s[index].name = e.target.value; setSpecs(s); }} placeholder="Name (e.g. Voltage)" className="w-full border border-line rounded-lg px-2.5 sm:px-3 py-2 text-[12px] sm:text-[13px] focus:outline-brand-green" />
+                  <input value={spec.value} onChange={e => { const s = [...specs]; s[index].value = e.target.value; setSpecs(s); }} placeholder="Value (e.g. 220)" className="w-full border border-line rounded-lg px-2.5 sm:px-3 py-2 text-[12px] sm:text-[13px] focus:outline-brand-green" />
+                  <input value={spec.unit} onChange={e => { const s = [...specs]; s[index].unit = e.target.value; setSpecs(s); }} placeholder="Unit (e.g. V)" className="w-full border border-line rounded-lg px-2.5 sm:px-3 py-2 text-[12px] sm:text-[13px] focus:outline-brand-green" />
                 </div>
-                <button onClick={() => removeSpec(index)} className="w-10 h-10 flex-shrink-0 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                <button onClick={() => removeSpec(index)} className="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>

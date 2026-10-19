@@ -26,15 +26,15 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f9f5] flex items-center justify-center p-4">
-      <div className="w-full max-w-[420px] bg-white rounded-3xl shadow-[0_20px_60px_rgba(8,18,22,0.06)] border border-[#dce5da] p-8 md:p-10 text-center animate-in fade-in slide-in-from-bottom-8 duration-500">
+    <div className="min-h-screen bg-[#f7f9f5] flex items-center justify-center p-3 sm:p-4">
+      <div className="w-full max-w-[420px] bg-white rounded-2xl sm:rounded-3xl shadow-[0_20px_60px_rgba(8,18,22,0.06)] border border-[#dce5da] p-6 sm:p-8 md:p-10 text-center animate-in fade-in slide-in-from-bottom-8 duration-500">
         
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#b9f74e] to-brand-green2 flex items-center justify-center shadow-[0_12px_30px_rgba(0,86,66,0.16)] mb-6">
-          <Lock className="w-7 h-7 text-white" />
+        <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#b9f74e] to-brand-green2 flex items-center justify-center shadow-[0_12px_30px_rgba(0,86,66,0.16)] mb-5 sm:mb-6">
+          <Lock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         </div>
         
-        <h1 className="text-3xl font-black tracking-tight text-ink mb-2">Welcome back</h1>
-        <p className="text-text mb-8">Sign in to the Maritama Trading Operations Portal.</p>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink mb-2">Welcome back</h1>
+        <p className="text-sm sm:text-base text-text mb-6 sm:mb-8">Sign in to the Maritama Trading Operations Portal.</p>
         
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium text-left">

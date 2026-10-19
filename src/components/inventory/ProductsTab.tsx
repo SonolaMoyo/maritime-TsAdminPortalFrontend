@@ -62,18 +62,18 @@ export function ProductsTab() {
 
   return (
     <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-sm">
-      <div className="p-4 border-b border-line flex justify-between items-center bg-[#fcfdfa]">
-        <div className="relative">
+      <div className="p-3 sm:p-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#fcfdfa]">
+        <div className="relative w-full sm:w-auto flex-1 max-w-[320px]">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a949d]" />
           <input 
             type="text" 
             placeholder="Search products..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-white text-[14px] font-medium text-ink w-[260px] focus:outline-none focus:border-brand-green transition-colors"
+            className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-white text-[13px] sm:text-[14px] font-medium text-ink w-full focus:outline-none focus:border-brand-green transition-colors"
           />
         </div>
-        <button onClick={() => setIsAddOpen(true)} className="px-4 py-2 bg-brand-green text-white text-[13px] font-bold rounded-lg flex items-center gap-2 hover:bg-brand-green2">
+        <button onClick={() => setIsAddOpen(true)} className="px-4 py-2 bg-brand-green text-white text-[13px] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-brand-green2 cursor-pointer w-full sm:w-auto">
           <Plus className="w-4 h-4" /> New Product
         </button>
       </div>

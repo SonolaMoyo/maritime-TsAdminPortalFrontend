@@ -1,36 +1,49 @@
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, Menu } from "lucide-react";
 
-export function Topbar() {
+interface TopbarProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export function Topbar({ onToggleMobileMenu }: TopbarProps) {
   return (
-    <header className="sticky top-0 z-40 min-h-[74px] px-5.5 py-2.5 bg-white/92 backdrop-blur-[16px] border-b border-[#dce5da] grid grid-cols-[minmax(280px,560px)_1fr_auto] gap-3.5 items-center">
-      <label className="h-[46px] border border-[#dce5da] rounded-xl bg-white flex items-center gap-2.5 px-3.5">
-        <Search className="w-5 h-5 text-gray-400" />
-        <input 
-          type="search" 
-          placeholder="Search orders, clients, products, invoices" 
-          className="border-0 outline-0 bg-transparent w-full text-sm"
-        />
-      </label>
-
-      <div className="flex gap-2 overflow-x-auto pb-0.5 px-2">
-        {/* {["All branches", "Lagos Office", "Abuja Branch", "Port Harcourt", "Online Orders"].map((branch, i) => (
+    <header className="sticky top-0 z-30 min-h-[64px] sm:min-h-[74px] px-3.5 sm:px-5.5 py-2.5 bg-white/95 backdrop-blur-[16px] border-b border-[#dce5da] flex items-center justify-between gap-3">
+      {/* Left side: Hamburger button + Search */}
+      <div className="flex items-center gap-2.5 flex-1 max-w-[560px] min-w-0">
+        {onToggleMobileMenu && (
           <button 
-            key={branch}
-            className={`h-[34px] border border-[#dce5da] rounded-full px-3.5 font-[800] text-[13px] whitespace-nowrap cursor-pointer ${i === 0 ? "bg-brand-green text-white border-brand-green" : "bg-white text-[#52606b]"}`}
+            type="button"
+            onClick={onToggleMobileMenu}
+            className="lg:hidden w-10 h-10 rounded-xl border border-line flex items-center justify-center text-ink hover:bg-[#f4f7f5] transition-colors flex-shrink-0 cursor-pointer"
+            aria-label="Toggle navigation menu"
           >
-            {branch}
+            <Menu className="w-5 h-5 text-ink" />
           </button>
-        ))} */}
+        )}
+
+        <label className="h-[42px] sm:h-[46px] border border-[#dce5da] rounded-xl bg-white flex items-center gap-2.5 px-3 sm:px-3.5 flex-1 min-w-0 focus-within:border-brand-green transition-colors">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
+          <input 
+            type="search" 
+            placeholder="Search orders, clients, products..." 
+            className="border-0 outline-0 bg-transparent w-full text-xs sm:text-sm min-w-0 placeholder:text-gray-400 text-ink"
+          />
+        </label>
       </div>
 
-      <div className="flex items-center gap-3 text-[#66727b] font-[750] whitespace-nowrap text-sm pr-4">
-        <span className="relative w-9 h-9 border border-[#dce5da] rounded-full grid place-items-center bg-white cursor-pointer">
-          <Bell className="w-[18px] h-[18px]" />
-          <i className="absolute -right-1 -top-1.5 min-w-[20px] h-[20px] rounded-full bg-[#e53e3e] text-white text-[11px] grid place-items-center font-black not-italic">
+      {/* Right side: Bell & User Info */}
+      <div className="flex items-center gap-2.5 sm:gap-3 text-[#66727b] font-[750] whitespace-nowrap text-sm flex-shrink-0">
+        <span className="relative w-8 h-8 sm:w-9 sm:h-9 border border-[#dce5da] rounded-full grid place-items-center bg-white cursor-pointer hover:bg-[#f8faf9] transition-colors">
+          <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-ink" />
+          <i className="absolute -right-1 -top-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] rounded-full bg-[#e53e3e] text-white text-[10px] sm:text-[11px] grid place-items-center font-black not-italic">
             2
           </i>
         </span>
-        <span>Admin · Administrator</span>
+        <div className="hidden sm:flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-brand-green/10 text-brand-green font-black text-xs flex items-center justify-center border border-brand-green/20">
+            AD
+          </div>
+          <span className="hidden md:inline text-ink text-sm">Admin · Operations</span>
+        </div>
       </div>
     </header>
   );

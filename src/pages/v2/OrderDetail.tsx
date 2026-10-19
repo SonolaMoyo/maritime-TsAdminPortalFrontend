@@ -154,7 +154,7 @@ export function OrderDetail() {
   };
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto w-full">
+    <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
       {/* Header & Nav */}
       <div className="mb-6">
         <button 
@@ -166,16 +166,16 @@ export function OrderDetail() {
 
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-black tracking-tight text-ink">{order.orderNumber}</h1>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">{order.orderNumber}</h1>
               <StatusPill status={order.status} />
               <span className="text-[12px] font-bold text-brand-green bg-[#eff5ed] px-2.5 py-1 rounded-full">
                 {order.segment}
               </span>
             </div>
-            <p className="text-[#5b6671] text-[15px] font-medium flex items-center gap-2">
+            <p className="text-[#5b6671] text-xs sm:text-[15px] font-medium flex flex-wrap items-center gap-2">
               <span>Total Value: <strong className="text-ink font-bold">₦{order.totalAmount.toLocaleString()}</strong></span>
-              <span>&bull;</span>
+              <span className="hidden sm:inline">&bull;</span>
               <span className="inline-flex items-center gap-1 text-brand-green font-bold">
                 <ShieldCheck className="w-4 h-4" /> Confirmed & Paid
               </span>
@@ -325,7 +325,7 @@ export function OrderDetail() {
           {/* Customer Details */}
           <Panel>
             <h2 className="text-[13px] font-black uppercase tracking-wider text-[#8a949d] mb-4">Customer Details</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
               <div>
                 <label className="text-[11px] text-[#8a949d] font-bold uppercase">Customer</label>
                 <div className="text-[14px] font-bold text-ink mt-0.5">{order.customerName}</div>
@@ -659,7 +659,7 @@ export function OrderDetail() {
           <p className="text-xs text-[#5b6671]">
             Assign the courier service and tracking code. The order will automatically move to <strong>In Transit</strong>.
           </p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Carrier / Logistics *</label>
               <select value={carrier} onChange={e => setCarrier(e.target.value)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
@@ -824,7 +824,7 @@ export function OrderDetail() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs">
               <div>
                 <span className="font-bold text-[#8a949d] uppercase">Deliver To:</span>
                 <div className="font-bold text-ink text-sm mt-0.5">{order.customerName}</div>

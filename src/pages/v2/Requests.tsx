@@ -88,15 +88,15 @@ export function Requests() {
   });
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto w-full">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-ink mb-1">Requests {segment !== 'All' && <span className="text-brand-green">— {segment}</span>}</h1>
-          <p className="text-[#5b6671] text-[15px] font-medium">Manage customer enquiries, quote requests and sales opportunities.</p>
+          <p className="text-[#5b6671] text-xs sm:text-[15px] font-medium">Manage customer enquiries, quote requests and sales opportunities.</p>
         </div>
         <button 
           onClick={() => setIsAddModalOpen(true)}
-          className="h-[44px] px-5 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 hover:-translate-y-0.5 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+          className="h-[44px] px-5 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 hover:-translate-y-0.5 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
           Add Request
@@ -104,7 +104,7 @@ export function Requests() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
         <MetricCard title="Total Requests" value={stats.total} subtitle="All time" />
         <MetricCard title="Pending" value={stats.pending} subtitle="Needs action" variant="lime" />
         <MetricCard title="In Progress" value={stats.inProgress} subtitle="Currently working" />
@@ -113,12 +113,12 @@ export function Requests() {
 
       {/* Tabs & Search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-b border-[#e4ece2] pb-4">
-        <div className="flex gap-6 overflow-x-auto">
+        <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-1">
           {["All", "Pending", "In Progress", "Completed"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-4 -mb-4 font-[800] text-[14px] whitespace-nowrap transition-colors border-b-[3px] ${
+              className={`pb-3 -mb-3.5 font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-colors border-b-[3px] ${
                 activeTab === tab ? "border-brand-green text-brand-green" : "border-transparent text-[#8a949d] hover:text-ink cursor-pointer"
               }`}
             >
@@ -127,20 +127,20 @@ export function Requests() {
           ))}
         </div>
         
-        <div className="flex gap-3">
-          <div className="relative">
+        <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a949d]" />
             <input 
               type="text" 
               placeholder="Search requests..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[14px] font-medium text-ink w-[240px] focus:outline-none focus:border-brand-green transition-colors"
+              className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[13px] sm:text-[14px] font-medium text-ink w-full sm:w-[240px] focus:outline-none focus:border-brand-green transition-colors"
             />
           </div>
-          <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[14px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer">
+          <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[13px] sm:text-[14px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer flex-shrink-0">
             <Filter className="w-4 h-4" />
-            Filters
+            <span className="hidden xs:inline">Filters</span>
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export function Requests() {
       {/* Add Request Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add Request">
         <form onSubmit={handleAddSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Customer Name *</label>
               <input required type="text" value={addForm.customerName} onChange={e => setAddForm({...addForm, customerName: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
@@ -224,7 +224,7 @@ export function Requests() {
           
           <hr className="border-line my-2" />
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
               <select required value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as SegmentType})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
@@ -248,9 +248,9 @@ export function Requests() {
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>
-            <button type="submit" disabled={isAdding} className="px-4 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50">
+          <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">Cancel</button>
+            <button type="submit" disabled={isAdding} className="w-full sm:w-auto px-4 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50 cursor-pointer">
               {isAdding ? "Saving..." : "Create Request"}
             </button>
           </div>

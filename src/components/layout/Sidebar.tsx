@@ -7,12 +7,18 @@ import {
   Package, 
   Folder, 
   Shield, 
-  Settings 
+  Settings,
+  X 
 } from "lucide-react";
 import { useSegment } from "../../context/SegmentContext";
 import type { ExtendedSegmentType } from "../../context/SegmentContext";
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { segment, setSegment } = useSegment();
@@ -73,15 +79,32 @@ export function Sidebar() {
     return item.aliases?.some(alias => current.startsWith(`${alias}/`)) ?? false;
   };
 
-  return (
-    <aside className="sticky top-0 h-screen bg-white border-r border-line flex flex-col z-50 w-[270px]">
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
+  const sidebarContent = (
+    <>
       {/* Brand Header */}
-      <div className="min-h-[74px] p-3.5 px-4.5 border-b border-[#e4ece2] flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#b9f74e] to-brand-green2 flex-shrink-0 shadow-[0_12px_30px_rgba(0,86,66,0.16)]" />
-        <div>
-          <b className="block leading-[1.05] tracking-[-0.02em]">Maritama Trading</b>
-          <span className="text-[#7a8791] text-xs font-[800]">Operations Portal</span>
+      <div className="min-h-[74px] p-3.5 px-4.5 border-b border-[#e4ece2] flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#b9f74e] to-brand-green2 flex-shrink-0 shadow-[0_12px_30px_rgba(0,86,66,0.16)]" />
+          <div>
+            <b className="block leading-[1.05] tracking-[-0.02em]">Maritama Trading</b>
+            <span className="text-[#7a8791] text-xs font-[800]">Operations Portal</span>
+          </div>
         </div>
+
+        {/* Close button for mobile drawer */}
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-[#5b6671] hover:text-ink hover:bg-[#f4f7f5] transition-colors"
+            aria-label="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Segment Selector */}
@@ -101,13 +124,14 @@ export function Sidebar() {
       </div>
 
       {/* Primary Navigation */}
-      <nav className="p-3.5 px-2 overflow-auto flex-1 space-y-1">
+      <nav className="p-3.5 px-2 overflow-y-auto flex-1 space-y-1">
         {navItems.map((item) => {
           const active = isItemActive(item);
           return (
             <Link
               key={item.path}
               to={item.path}
+              onClick={handleNavClick}
               className={cn(
                 "w-full min-h-[48px] rounded-[10px] px-3.5 flex items-center gap-3 text-[#5b6671] font-[850] transition-all",
                 "hover:bg-[#eef5ed] hover:text-brand-green hover:translate-x-0.5",
@@ -128,12 +152,42 @@ export function Sidebar() {
           <span className="block text-[#8a949d] text-[13px]">Administrator</span>
         </div>
         <button 
-          onClick={() => navigate('/login')}
+          onClick={() => {
+            if (onClose) onClose();
+            navigate('/login');
+          }}
           className="h-[40px] px-4 rounded-full border border-line bg-white font-[800] text-sm hover:-translate-y-0.5 transition-transform shadow-sm cursor-pointer"
         >
           Sign out
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden lg:flex lg:flex-col lg:sticky lg:top-0 lg:h-screen bg-white border-r border-line z-30 w-[270px] flex-shrink-0">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Backdrop */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 lg:hidden transition-opacity"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Mobile Drawer Panel */}
+      <aside 
+        className={cn(
+          "fixed inset-y-0 left-0 w-[280px] sm:w-[300px] bg-white z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out lg:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

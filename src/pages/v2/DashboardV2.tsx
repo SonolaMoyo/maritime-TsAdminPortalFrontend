@@ -295,27 +295,30 @@ export function DashboardV2() {
   }, [ordersData, requestsData, inventoryData, catalogData, periodMultiplier, segment]);
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto w-full space-y-6">
+    <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full space-y-4 sm:space-y-6">
       {/* Executive Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-ink tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-ink tracking-tight">
             Dashboard {segment !== "All" && <span className="text-brand-green">— {segment}</span>}
           </h1>
+          <p className="text-xs sm:text-sm text-[#5b6671] font-medium mt-1">
+            Real-time operations velocity, lead generation, inventory status, and catalog overview.
+          </p>
         </div>
 
         {/* Time Adjuster Bar (Month & Year Filter) */}
-        <div className="bg-white border border-line rounded-2xl p-2.5 shadow-sm flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#8a949d] pl-2 uppercase tracking-wider">
-            <Calendar className="w-4 h-4 text-brand-green" />
-            <span>Period:</span>
+        <div className="w-full md:w-auto bg-white border border-line rounded-2xl p-2 sm:p-2.5 shadow-sm flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#8a949d] pl-1 sm:pl-2 uppercase tracking-wider">
+            <Calendar className="w-4 h-4 text-brand-green flex-shrink-0" />
+            <span className="hidden xs:inline">Period:</span>
           </div>
 
           {/* Month Selector */}
           <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="h-[38px] px-3 rounded-xl border border-line bg-[#fcfdfa] text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
+            className="flex-1 sm:flex-none h-[38px] px-2.5 sm:px-3 rounded-xl border border-line bg-[#fcfdfa] text-xs sm:text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
           >
             {MONTHS.map(m => (
               <option key={m.value} value={m.value}>{m.label}</option>
@@ -326,7 +329,7 @@ export function DashboardV2() {
           <select 
             value={selectedYear} 
             onChange={(e) => setSelectedYear(e.target.value)}
-            className="h-[38px] px-3 rounded-xl border border-line bg-[#fcfdfa] text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
+            className="h-[38px] px-2.5 sm:px-3 rounded-xl border border-line bg-[#fcfdfa] text-xs sm:text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
           >
             {YEARS.map(y => (
               <option key={y} value={y}>{y}</option>
@@ -339,61 +342,61 @@ export function DashboardV2() {
               className="text-xs font-bold text-brand-green hover:underline px-2 py-1 cursor-pointer"
               title="Reset to current month"
             >
-              Reset to Current
+              Reset
             </button>
           )}
         </div>
       </div>
 
       {/* 4 Major Features Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
         {/* 1. ORDERS CARD & GRAPH */}
         <div 
           onClick={() => navigate('/orders')}
           className="group cursor-pointer"
         >
-          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
+          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
             <div>
               {/* Header with Direct Redirect */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#d8edd6] text-brand-green flex items-center justify-center shadow-sm">
-                    <ShoppingCart className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#d8edd6] text-brand-green flex items-center justify-center shadow-sm">
+                    <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
+                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
                       Orders
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h2>
-                    <p className="text-xs text-[#5b6671] font-medium">Prepaid orders & fulfillment velocity</p>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Prepaid orders & fulfillment velocity</p>
                   </div>
                 </div>
 
                 <button 
                   onClick={(e) => { e.stopPropagation(); navigate('/orders'); }}
-                  className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
                 >
-                  <span>Open Orders</span>
+                  <span className="hidden xs:inline">Open</span> Orders
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* KPI Chips */}
-              <div className="grid grid-cols-3 gap-3 mb-6 bg-[#fcfdfa] p-3.5 rounded-xl border border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Orders</span>
-                  <strong className="text-2xl font-black text-ink">{stats.orders.total}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.orders.total}</strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">Prepaid</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Paid Revenue</span>
-                  <strong className="text-xl font-black text-brand-green">₦{stats.orders.revenue.toLocaleString()}</strong>
+                  <strong className="text-lg sm:text-xl font-black text-brand-green truncate block">₦{stats.orders.revenue.toLocaleString()}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Verified</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">In Fulfillment</span>
-                  <strong className="text-2xl font-black text-blue-600">{stats.orders.inFulfillment}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-blue-600">{stats.orders.inFulfillment}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">{stats.orders.fulfilled} completed</span>
                 </div>
               </div>
@@ -401,11 +404,11 @@ export function DashboardV2() {
               {/* Movement Graph */}
               <div>
                 <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
-                  <span className="flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-brand-green" />
+                  <span className="flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 text-brand-green flex-shrink-0" />
                     Order Volume Movement ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
-                  <span className="text-brand-green font-black">Active Trajectory</span>
+                  <span className="text-brand-green font-black flex-shrink-0">Active</span>
                 </div>
                 <MovementGraph 
                   data={ordersData} 
@@ -416,9 +419,9 @@ export function DashboardV2() {
               </div>
             </div>
 
-            <div className="pt-4 mt-2 border-t border-line flex items-center justify-between text-xs text-[#8a949d]">
-              <span>Stages: Processing &bull; Ready to Dispatch &bull; In Transit &bull; Delivered</span>
-              <span className="font-bold text-brand-green group-hover:underline">Explore Orders &rarr;</span>
+            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
+              <span className="line-clamp-1">Stages: Processing &bull; Ready &bull; In Transit &bull; Delivered</span>
+              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Orders &rarr;</span>
             </div>
           </Panel>
         </div>
@@ -428,47 +431,47 @@ export function DashboardV2() {
           onClick={() => navigate('/requests')}
           className="group cursor-pointer"
         >
-          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
+          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
             <div>
               {/* Header with Direct Redirect */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f2f7ef] text-brand-green flex items-center justify-center shadow-sm">
-                    <Inbox className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f2f7ef] text-brand-green flex items-center justify-center shadow-sm">
+                    <Inbox className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
+                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
                       Requests
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h2>
-                    <p className="text-xs text-[#5b6671] font-medium">Commercial quotes, inquiries & win rate</p>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial quotes, inquiries & win rate</p>
                   </div>
                 </div>
 
                 <button 
                   onClick={(e) => { e.stopPropagation(); navigate('/requests'); }}
-                  className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
                 >
-                  <span>Open Requests</span>
+                  <span className="hidden xs:inline">Open</span> Requests
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* KPI Chips */}
-              <div className="grid grid-cols-3 gap-3 mb-6 bg-[#fcfdfa] p-3.5 rounded-xl border border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Quotes</span>
-                  <strong className="text-2xl font-black text-ink">{stats.requests.total}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.requests.total}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Inquiries</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Deals Won</span>
-                  <strong className="text-2xl font-black text-brand-green">{stats.requests.won}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.requests.won}</strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">48% Win Rate</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">In Negotiation</span>
-                  <strong className="text-2xl font-black text-[#996600]">{stats.requests.active}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-[#996600]">{stats.requests.active}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Active Leads</span>
                 </div>
               </div>
@@ -476,11 +479,11 @@ export function DashboardV2() {
               {/* Movement Graph */}
               <div>
                 <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
-                  <span className="flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
                     Quote Request Inflow ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
-                  <span className="text-blue-600 font-black">Lead Momentum</span>
+                  <span className="text-blue-600 font-black flex-shrink-0">Momentum</span>
                 </div>
                 <MovementGraph 
                   data={requestsData} 
@@ -491,9 +494,9 @@ export function DashboardV2() {
               </div>
             </div>
 
-            <div className="pt-4 mt-2 border-t border-line flex items-center justify-between text-xs text-[#8a949d]">
-              <span>Pipeline: New &bull; Contacted &bull; Quote Sent &bull; Negotiation &bull; Won</span>
-              <span className="font-bold text-brand-green group-hover:underline">Explore Requests &rarr;</span>
+            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
+              <span className="line-clamp-1">Pipeline: New &bull; Contacted &bull; Quote Sent &bull; Won</span>
+              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Requests &rarr;</span>
             </div>
           </Panel>
         </div>
@@ -503,47 +506,47 @@ export function DashboardV2() {
           onClick={() => navigate('/inventory')}
           className="group cursor-pointer"
         >
-          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
+          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
             <div>
               {/* Header with Direct Redirect */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#e4ece2] text-brand-green flex items-center justify-center shadow-sm">
-                    <Package className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#e4ece2] text-brand-green flex items-center justify-center shadow-sm">
+                    <Package className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
+                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
                       Inventory
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h2>
-                    <p className="text-xs text-[#5b6671] font-medium">Warehouse stock levels & movement</p>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Warehouse stock levels & movement</p>
                   </div>
                 </div>
 
                 <button 
                   onClick={(e) => { e.stopPropagation(); navigate('/inventory'); }}
-                  className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
                 >
-                  <span>Open Inventory</span>
+                  <span className="hidden xs:inline">Open</span> Inventory
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* KPI Chips */}
-              <div className="grid grid-cols-3 gap-3 mb-6 bg-[#fcfdfa] p-3.5 rounded-xl border border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Stock Units</span>
-                  <strong className="text-2xl font-black text-ink">{stats.inventory.totalStock}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.inventory.totalStock}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Across Hubs</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Stock Health</span>
-                  <strong className="text-2xl font-black text-brand-green">{stats.inventory.healthPct}%</strong>
-                  <span className="text-[11px] text-brand-green font-bold block mt-0.5">Optimal Level</span>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.inventory.healthPct}%</strong>
+                  <span className="text-[11px] text-brand-green font-bold block mt-0.5">Optimal</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Warehouses</span>
-                  <strong className="text-2xl font-black text-purple-700">{stats.inventory.warehouses}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-purple-700">{stats.inventory.warehouses}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">{stats.inventory.incoming} Inbound</span>
                 </div>
               </div>
@@ -551,11 +554,11 @@ export function DashboardV2() {
               {/* Movement Graph */}
               <div>
                 <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
-                  <span className="flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-purple-600" />
-                    Stock Availability Movement ({selectedMonth === "all" ? "Monthly" : "Weekly"})
+                  <span className="flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+                    Stock Availability ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
-                  <span className="text-purple-600 font-black">Stock Throughput</span>
+                  <span className="text-purple-600 font-black flex-shrink-0">Throughput</span>
                 </div>
                 <MovementGraph 
                   data={inventoryData} 
@@ -566,9 +569,9 @@ export function DashboardV2() {
               </div>
             </div>
 
-            <div className="pt-4 mt-2 border-t border-line flex items-center justify-between text-xs text-[#8a949d]">
-              <span>Logistics: Warehouses &bull; Stock Transfers &bull; Inbound Receipts &bull; Suppliers</span>
-              <span className="font-bold text-brand-green group-hover:underline">Explore Inventory &rarr;</span>
+            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
+              <span className="line-clamp-1">Logistics: Hubs &bull; Transfers &bull; Receipts &bull; Suppliers</span>
+              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Inventory &rarr;</span>
             </div>
           </Panel>
         </div>
@@ -578,59 +581,59 @@ export function DashboardV2() {
           onClick={() => navigate('/catalog')}
           className="group cursor-pointer"
         >
-          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-6 bg-white relative flex flex-col justify-between">
+          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
             <div>
               {/* Header with Direct Redirect */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f4f7f5] text-brand-green flex items-center justify-center shadow-sm">
-                    <Folder className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f4f7f5] text-brand-green flex items-center justify-center shadow-sm">
+                    <Folder className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
+                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
                       Catalog
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h2>
-                    <p className="text-xs text-[#5b6671] font-medium">Commercial product portfolio & brands</p>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial product portfolio & brands</p>
                   </div>
                 </div>
 
                 <button 
                   onClick={(e) => { e.stopPropagation(); navigate('/catalog'); }}
-                  className="px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
                 >
-                  <span>Open Catalog</span>
+                  <span className="hidden xs:inline">Open</span> Catalog
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* KPI Chips */}
-              <div className="grid grid-cols-3 gap-3 mb-6 bg-[#fcfdfa] p-3.5 rounded-xl border border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Products</span>
-                  <strong className="text-2xl font-black text-ink">{stats.catalog.published}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.catalog.published}</strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">Published</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Categories</span>
-                  <strong className="text-2xl font-black text-brand-green">{stats.catalog.categories}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.catalog.categories}</strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Active Lines</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Featured</span>
-                  <strong className="text-2xl font-black text-amber-600">{stats.catalog.featured}</strong>
-                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Showcase Items</span>
+                  <strong className="text-xl sm:text-2xl font-black text-amber-600">{stats.catalog.featured}</strong>
+                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Showcase</span>
                 </div>
               </div>
 
               {/* Movement Graph */}
               <div>
                 <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
-                  <span className="flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-brand-orange" />
-                    Portfolio Growth Movement ({selectedMonth === "all" ? "Monthly" : "Weekly"})
+                  <span className="flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 text-brand-orange flex-shrink-0" />
+                    Portfolio Growth ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
-                  <span className="text-brand-orange font-black">Catalog Expansion</span>
+                  <span className="text-brand-orange font-black flex-shrink-0">Expansion</span>
                 </div>
                 <MovementGraph 
                   data={catalogData} 
@@ -641,9 +644,9 @@ export function DashboardV2() {
               </div>
             </div>
 
-            <div className="pt-4 mt-2 border-t border-line flex items-center justify-between text-xs text-[#8a949d]">
-              <span>Content: Products &bull; Categories &bull; Featured Showcase &bull; Media</span>
-              <span className="font-bold text-brand-green group-hover:underline">Explore Catalog &rarr;</span>
+            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
+              <span className="line-clamp-1">Content: Products &bull; Categories &bull; Featured &bull; Media</span>
+              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Catalog &rarr;</span>
             </div>
           </Panel>
         </div>

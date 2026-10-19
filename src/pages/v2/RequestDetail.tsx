@@ -111,43 +111,43 @@ export function RequestDetail() {
   };
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto w-full">
+    <div className="p-4 sm:p-6 max-w-[1200px] mx-auto w-full">
       {/* Top Header */}
       <div className="mb-6">
         <button 
           onClick={() => navigate('/requests')} 
-          className="flex items-center gap-2 text-[#5b6671] text-sm font-bold hover:text-ink transition-colors mb-4"
+          className="flex items-center gap-2 text-[#5b6671] text-sm font-bold hover:text-ink transition-colors mb-4 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Requests
         </button>
 
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-black tracking-tight text-ink">{request.requestNumber}</h1>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink">{request.requestNumber}</h1>
               <StatusPill status={request.status} />
             </div>
-            <p className="text-[#5b6671] text-[16px] font-medium">
+            <p className="text-[#5b6671] text-sm sm:text-[16px] font-medium">
               {request.product} &mdash; {request.quantity} Units
             </p>
-            <div className="flex items-center gap-4 mt-3 text-[13px] font-semibold text-[#8a949d]">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-3 text-xs sm:text-[13px] font-semibold text-[#8a949d]">
               <span className="flex items-center gap-1"><User className="w-4 h-4"/> {request.customerName}</span>
               <span className="flex items-center gap-1"><Building className="w-4 h-4"/> {request.companyName}</span>
               <span className="flex items-center gap-1"><Calendar className="w-4 h-4"/> Created: {new Date(request.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => setActiveModal("assign")} className="h-[40px] px-4 rounded-full border border-line bg-white text-ink font-[800] text-[14px] hover:bg-[#fcfdfa] shadow-sm transition-all">
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => setActiveModal("assign")} className="h-[40px] px-4 rounded-full border border-line bg-white text-ink font-[800] text-[13px] sm:text-[14px] hover:bg-[#fcfdfa] shadow-sm transition-all cursor-pointer">
               Assign
             </button>
-            <button onClick={() => setActiveModal("status")} className="h-[40px] px-4 rounded-full border border-line bg-white text-ink font-[800] text-[14px] hover:bg-[#fcfdfa] shadow-sm transition-all">
+            <button onClick={() => setActiveModal("status")} className="h-[40px] px-4 rounded-full border border-line bg-white text-ink font-[800] text-[13px] sm:text-[14px] hover:bg-[#fcfdfa] shadow-sm transition-all cursor-pointer">
               Change Status
             </button>
-            <button onClick={() => setActiveModal("quote")} className="h-[40px] px-4 rounded-full bg-ink text-white font-[800] text-[14px] hover:bg-black shadow-sm transition-all">
+            <button onClick={() => setActiveModal("quote")} className="h-[40px] px-4 rounded-full bg-ink text-white font-[800] text-[13px] sm:text-[14px] hover:bg-black shadow-sm transition-all cursor-pointer">
               Create Quote
             </button>
-            <button onClick={() => setActiveModal("done")} className="h-[40px] px-4 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 shadow-sm transition-all">
+            <button onClick={() => setActiveModal("done")} className="h-[40px] px-4 rounded-full bg-brand-green text-white font-[800] text-[13px] sm:text-[14px] hover:bg-brand-green2 shadow-sm transition-all cursor-pointer">
               Mark as Done
             </button>
           </div>
@@ -341,7 +341,7 @@ export function RequestDetail() {
             <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Product Being Quoted</label>
             <input type="text" disabled value={request.product} className="w-full border border-line rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Quantity</label>
               <input type="number" disabled value={request.quantity} className="w-full border border-line rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500" />
@@ -351,9 +351,9 @@ export function RequestDetail() {
               <input required type="number" min="0" value={quoteAmount} onChange={e => setQuoteAmount(Number(e.target.value))} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
             </div>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>
-            <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-full bg-ink text-white text-sm font-bold hover:bg-black disabled:opacity-50">Generate & Send</button>
+          <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+            <button type="button" onClick={() => setActiveModal(null)} className="w-full sm:w-auto px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">Cancel</button>
+            <button type="submit" disabled={isSubmitting} className="w-full sm:w-auto px-4 py-2 rounded-full bg-ink text-white text-sm font-bold hover:bg-black disabled:opacity-50 cursor-pointer">Generate & Send</button>
           </div>
         </form>
       </Modal>

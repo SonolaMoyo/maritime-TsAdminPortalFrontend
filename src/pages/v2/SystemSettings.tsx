@@ -31,14 +31,14 @@ export function SystemSettings() {
   };
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto w-full">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div className="p-4 sm:p-6 max-w-[1200px] mx-auto w-full">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-1 sm:mb-2">
             {activeSection && (
               <button 
                 onClick={() => setActiveSection(null)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-line text-[#5b6671] hover:text-ink hover:bg-[#fcfdfa] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-line text-[#5b6671] hover:text-ink hover:bg-[#fcfdfa] transition-colors cursor-pointer"
                 title="Back to Overview"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -46,7 +46,7 @@ export function SystemSettings() {
             )}
             <h1 className="text-2xl font-black text-ink">System Settings</h1>
           </div>
-          <p className="text-[#5b6671] text-[15px] font-medium ml-11">
+          <p className="text-[#5b6671] text-xs sm:text-[15px] font-medium ml-0 sm:ml-11">
             Configure your platform and business preferences.
           </p>
         </div>

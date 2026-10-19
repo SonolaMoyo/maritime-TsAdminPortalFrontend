@@ -8,17 +8,17 @@ export function RolesPermissions() {
   const [activeTab, setActiveTab] = useState("Users");
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto w-full">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-black text-ink mb-2">Roles & Permissions</h1>
-          <p className="text-[#5b6671] text-[15px] font-medium">
+          <h1 className="text-2xl font-black text-ink mb-1">Roles & Permissions</h1>
+          <p className="text-[#5b6671] text-xs sm:text-[15px] font-medium">
             Manage who can access the Admin Portal, their roles, and system permissions.
           </p>
         </div>
       </div>
 
-      <div className="flex overflow-x-auto gap-6 border-b border-[#e4ece2] mb-6">
+      <div className="flex overflow-x-auto gap-4 sm:gap-6 border-b border-[#e4ece2] mb-6 pb-1">
         {["Users", "Roles", "Permissions", "Activity / Audit Log"].map((tab) => (
           <button
             key={tab}
