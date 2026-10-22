@@ -68,7 +68,6 @@ export function FeaturedTab() {
               </TableCell>
               <TableCell>
                 <div className="font-bold text-ink text-[14px]">{prod.name}</div>
-                <div className="text-[12px] text-[#8a949d] font-medium">SKU: {prod.id}</div>
               </TableCell>
               <TableCell>
                 <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{prod.segment}</span>

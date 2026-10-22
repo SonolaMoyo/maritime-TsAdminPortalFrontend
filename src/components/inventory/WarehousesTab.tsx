@@ -124,7 +124,6 @@ export function WarehousesTab() {
               <TableRow key={item.id}>
                 <TableCell>
                   <div className="font-bold text-ink text-[14px]">{item.productName}</div>
-                  <div className="text-[12px] text-[#8a949d] font-medium">SKU: {item.productId}</div>
                 </TableCell>
                 <TableCell>
                   <div className="font-black text-ink">{item.quantity}</div>

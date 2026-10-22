@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Filter, CheckCircle2, PackageCheck, Truck, Clock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Plus, Search, Filter, CheckCircle2, PackageCheck, Truck, Clock, ArrowRight, ShieldCheck, Trash2 } from "lucide-react";
 import { Table, TableRow, TableCell } from "../../components/ui/Table";
 import { StatusPill } from "../../components/ui/StatusPill";
 import { ordersService } from "../../services/ordersService";
+import { inventoryService } from "../../services/inventoryService";
+import type { ProductInventory } from "../../data/mockInventory";
 import type { Order, SegmentType, OrderStatus } from "../../data/mockOrders";
 import { useSegment } from "../../context/SegmentContext";
 import { MetricCard } from "../../components/ui/Card";
@@ -19,6 +21,14 @@ const TABS: Array<"All" | OrderStatus> = [
   "Cancelled",
 ];
 
+interface OrderItemRow {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  availableStock: number;
+}
+
 export function OrdersV2() {
   const navigate = useNavigate();
   const { segment } = useSegment();
@@ -29,7 +39,8 @@ export function OrdersV2() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  
+  const [inventoryProducts, setInventoryProducts] = useState<ProductInventory[]>([]);
+
   const [addForm, setAddForm] = useState(() => ({
     customerName: "",
     companyName: "",
@@ -38,12 +49,14 @@ export function OrdersV2() {
     segment: "Solar Tech" as SegmentType,
     deliveryLocation: "",
     deliveryAddress: "",
-    productName: "",
-    quantity: 1,
-    unitPrice: 0,
     paymentMethod: "Bank Transfer",
     paymentRef: `PAY-${Math.floor(100000 + Math.random() * 900000)}`
   }));
+
+  const [orderItems, setOrderItems] = useState<OrderItemRow[]>([
+    { productId: "", productName: "", quantity: 1, unitPrice: 0, availableStock: 0 }
+  ]);
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -57,26 +70,116 @@ export function OrdersV2() {
     }
   }, []);
 
+  const fetchInventory = useCallback(async () => {
+    try {
+      const items = await inventoryService.getInventory();
+      setInventoryProducts(items);
+    } catch (err) {
+      console.error("Failed to load inventory for orders:", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchOrders();
-  }, [fetchOrders]);
+    fetchInventory();
+  }, [fetchOrders, fetchInventory]);
+
+  const handleOpenAddModal = () => {
+    fetchInventory();
+    setAddForm(prev => ({
+      ...prev,
+      customerName: "",
+      companyName: "",
+      email: "",
+      phone: "",
+      segment: segment !== 'All' ? (segment as SegmentType) : "Solar Tech",
+      deliveryLocation: "",
+      deliveryAddress: "",
+      paymentRef: `PAY-${Math.floor(100000 + Math.random() * 900000)}`
+    }));
+    setOrderItems([
+      { productId: "", productName: "", quantity: 1, unitPrice: 0, availableStock: 0 }
+    ]);
+    setDeliveryFee(0);
+    setIsAddModalOpen(true);
+  };
+
+  const handleItemProductChange = (index: number, productId: string) => {
+    const selected = inventoryProducts.find(p => p.productId === productId);
+    setOrderItems(prev => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        productId,
+        productName: selected ? selected.productName : "",
+        availableStock: selected ? selected.availableQuantity : 0,
+      };
+      return next;
+    });
+  };
+
+  const handleItemQuantityChange = (index: number, quantity: number) => {
+    setOrderItems(prev => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        quantity: Math.max(1, quantity),
+      };
+      return next;
+    });
+  };
+
+  const handleItemUnitPriceChange = (index: number, unitPrice: number) => {
+    setOrderItems(prev => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        unitPrice: Math.max(0, unitPrice),
+      };
+      return next;
+    });
+  };
+
+  const handleAddItemRow = () => {
+    setOrderItems(prev => [
+      ...prev,
+      { productId: "", productName: "", quantity: 1, unitPrice: 0, availableStock: 0 }
+    ]);
+  };
+
+  const handleRemoveItemRow = (index: number) => {
+    if (orderItems.length <= 1) return;
+    setOrderItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const calculatedSubtotal = orderItems.reduce((acc, i) => acc + (i.quantity * i.unitPrice), 0);
+  const calculatedTotal = calculatedSubtotal + Number(deliveryFee || 0);
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validItems = orderItems.filter(i => i.productId && i.productName);
+    if (validItems.length === 0) {
+      alert("Please select at least one product from inventory for this order.");
+      return;
+    }
+
     setIsAdding(true);
     try {
-      const items = [{
-        id: `oi-${Date.now()}`,
-        productId: `prod-${Date.now()}`,
-        productName: addForm.productName,
-        quantity: addForm.quantity,
-        unitPrice: addForm.unitPrice,
-        totalPrice: addForm.quantity * addForm.unitPrice,
-        allocatedQuantity: 0
-      }];
-      
-      const totalAmount = items[0].totalPrice;
-      
+      const items = validItems.map((item, idx) => ({
+        id: `oi-${Date.now()}-${idx}`,
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.quantity * item.unitPrice,
+        allocatedQuantity: 0,
+      }));
+
+      const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
+      const deliveryAmt = Number(deliveryFee || 0);
+      const totalAmount = subtotal + deliveryAmt;
+
       await ordersService.createOrder({
         customerName: addForm.customerName,
         companyName: addForm.companyName,
@@ -84,16 +187,18 @@ export function OrdersV2() {
         phone: addForm.phone,
         segment: addForm.segment,
         items,
-        subtotal: totalAmount,
-        totalAmount: totalAmount,
+        subtotal,
+        deliveryFee: deliveryAmt,
+        totalAmount,
         paymentMethod: addForm.paymentMethod,
         paymentRef: addForm.paymentRef,
         delivery: {
           status: "Processing",
           location: addForm.deliveryLocation,
-          address: addForm.deliveryAddress
-        }
+          address: addForm.deliveryAddress,
+        },
       });
+
       await fetchOrders();
       setIsAddModalOpen(false);
       setAddForm({
@@ -104,12 +209,11 @@ export function OrdersV2() {
         segment: "Solar Tech",
         deliveryLocation: "",
         deliveryAddress: "",
-        productName: "",
-        quantity: 1,
-        unitPrice: 0,
         paymentMethod: "Bank Transfer",
-        paymentRef: `PAY-${Math.floor(100000 + Math.random() * 900000)}`
+        paymentRef: `PAY-${Math.floor(100000 + Math.random() * 900000)}`,
       });
+      setOrderItems([{ productId: "", productName: "", quantity: 1, unitPrice: 0, availableStock: 0 }]);
+      setDeliveryFee(0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -165,13 +269,7 @@ export function OrdersV2() {
           </p>
         </div>
         <button 
-          onClick={() => {
-            setAddForm(prev => ({
-              ...prev,
-              paymentRef: `PAY-${Math.floor(100000 + Math.random() * 900000)}`
-            }));
-            setIsAddModalOpen(true);
-          }}
+          onClick={handleOpenAddModal}
           className="h-[44px] px-5 rounded-full bg-brand-green text-white font-[800] text-[14px] hover:bg-brand-green2 hover:-translate-y-0.5 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
@@ -438,7 +536,7 @@ export function OrdersV2() {
           
           <hr className="border-line my-2" />
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
               <select required value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as SegmentType})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
@@ -448,61 +546,153 @@ export function OrdersV2() {
                 <option value="Electronics">Electronics</option>
               </select>
             </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Product Name *</label>
-              <input required type="text" value={addForm.productName} onChange={e => setAddForm({...addForm, productName: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. SolarMax 10kW Inverter" />
-            </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Quantity *</label>
-              <input required type="number" min="1" value={addForm.quantity} onChange={e => setAddForm({...addForm, quantity: Number(e.target.value)})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
-            </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Unit Price (₦) *</label>
-              <input required type="number" min="0" value={addForm.unitPrice} onChange={e => setAddForm({...addForm, unitPrice: Number(e.target.value)})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
-            </div>
-          </div>
 
-          <div className="bg-[#fcfdfa] p-3 rounded-lg border border-line flex justify-between items-center text-sm font-bold text-ink">
-            <span>Calculated Total Value:</span>
-            <span className="text-base text-brand-green">₦{(addForm.quantity * addForm.unitPrice).toLocaleString()}</span>
-          </div>
+            {/* Multiple Product Selection linked to Inventory */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-[12px] font-black uppercase tracking-wider text-ink">
+                  Order Products ({orderItems.length})
+                </label>
+                <button
+                  type="button"
+                  onClick={handleAddItemRow}
+                  className="text-[12px] font-bold text-brand-green hover:text-brand-green2 flex items-center gap-1 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Another Product
+                </button>
+              </div>
 
-          <hr className="border-line my-2" />
+              {orderItems.map((item, index) => (
+                <div key={index} className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold text-[#8a949d] uppercase">Product #{index + 1}</span>
+                    {orderItems.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItemRow(index)}
+                        className="text-[#a11f1f] hover:text-red-700 p-1 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Remove
+                      </button>
+                    )}
+                  </div>
 
-          {/* Payment & Delivery Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Method *</label>
-              <select value={addForm.paymentMethod} onChange={e => setAddForm({...addForm, paymentMethod: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Credit Card">Credit Card</option>
-                <option value="Corporate Transfer">Corporate Transfer</option>
-                <option value="Direct Deposit">Direct Deposit</option>
-                <option value="POS / Cash">POS / Cash</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Reference *</label>
-              <input required type="text" value={addForm.paymentRef} onChange={e => setAddForm({...addForm, paymentRef: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green font-mono" />
-            </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Delivery City/State *</label>
-              <input required type="text" value={addForm.deliveryLocation} onChange={e => setAddForm({...addForm, deliveryLocation: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. Lagos, Nigeria" />
-            </div>
-            <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Street Address</label>
-              <input type="text" value={addForm.deliveryAddress} onChange={e => setAddForm({...addForm, deliveryAddress: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. 14 Industrial Way, Ikeja" />
-            </div>
-          </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    <div className="sm:col-span-6">
+                      <label className="block text-[11px] font-bold text-[#8a949d] mb-1">Select Inventory Product *</label>
+                      <select
+                        required
+                        value={item.productId}
+                        onChange={e => handleItemProductChange(index, e.target.value)}
+                        className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white font-medium text-ink"
+                      >
+                        <option value="">-- Choose Product from Inventory --</option>
+                        {inventoryProducts.map(p => (
+                          <option key={`${p.id}-${p.productId}`} value={p.productId}>
+                            {p.productName} ({p.availableQuantity} available • {p.segment})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-          <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
-            <button type="button" onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">
-              Cancel
-            </button>
-            <button type="submit" disabled={isAdding} className="w-full sm:w-auto px-5 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
-              <PackageCheck className="w-4 h-4" />
-              {isAdding ? "Queuing Order..." : "Confirm & Move to Processing"}
-            </button>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-bold text-[#8a949d] mb-1">Qty *</label>
+                      <input
+                        required
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={e => handleItemQuantityChange(index, Number(e.target.value))}
+                        className="w-full border border-line rounded-lg px-2.5 py-2 text-sm focus:outline-brand-green text-center font-bold text-ink bg-white"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-4">
+                      <label className="block text-[11px] font-bold text-[#8a949d] mb-1">Unit Price (₦) *</label>
+                      <input
+                        required
+                        type="number"
+                        min="0"
+                        value={item.unitPrice}
+                        onChange={e => handleItemUnitPriceChange(index, Number(e.target.value))}
+                        className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green font-medium text-ink bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs text-[#5b6671] pt-1 border-t border-line/60">
+                    <span>
+                      {item.availableStock > 0 ? (
+                        <span className="text-brand-green font-semibold">✓ {item.availableStock} units in warehouse</span>
+                      ) : item.productId ? (
+                        <span className="text-[#a11f1f] font-semibold">⚠ 0 units available in warehouse</span>
+                      ) : (
+                        <span>Select a product to view stock</span>
+                      )}
+                    </span>
+                    <span className="font-bold text-ink">Line Total: ₦{(item.quantity * item.unitPrice).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <hr className="border-line my-2" />
+
+            {/* Payment & Delivery Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Method *</label>
+                <select value={addForm.paymentMethod} onChange={e => setAddForm({...addForm, paymentMethod: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Corporate Transfer">Corporate Transfer</option>
+                  <option value="Direct Deposit">Direct Deposit</option>
+                  <option value="POS / Cash">POS / Cash</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Reference *</label>
+                <input required type="text" value={addForm.paymentRef} onChange={e => setAddForm({...addForm, paymentRef: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green font-mono" />
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Delivery City/State *</label>
+                <input required type="text" value={addForm.deliveryLocation} onChange={e => setAddForm({...addForm, deliveryLocation: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. Lagos, Nigeria" />
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Street Address</label>
+                <input type="text" value={addForm.deliveryAddress} onChange={e => setAddForm({...addForm, deliveryAddress: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" placeholder="e.g. 14 Industrial Way, Ikeja" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Delivery Fee / Amount (₦)</label>
+                <input type="number" min="0" value={deliveryFee} onChange={e => setDeliveryFee(Math.max(0, Number(e.target.value)))} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green font-bold text-ink" placeholder="0" />
+              </div>
+            </div>
+
+            {/* Price Breakdown Summary */}
+            <div className="bg-[#fcfdfa] p-3.5 rounded-xl border border-line space-y-2 text-sm">
+              <div className="flex justify-between text-[#5b6671]">
+                <span>Items Subtotal ({orderItems.reduce((acc, i) => acc + (i.productId ? i.quantity : 0), 0)} unit(s)):</span>
+                <span className="font-bold text-ink">₦{calculatedSubtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-[#5b6671]">
+                <span>Delivery Fee:</span>
+                <span className="font-bold text-ink">₦{Number(deliveryFee || 0).toLocaleString()}</span>
+              </div>
+              <div className="border-t border-line pt-2 flex justify-between items-center text-ink font-bold">
+                <span>Total Order Amount:</span>
+                <span className="text-lg text-brand-green font-black">₦{calculatedTotal.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+              <button type="button" onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">
+                Cancel
+              </button>
+              <button type="submit" disabled={isAdding} className="w-full sm:w-auto px-5 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer">
+                <PackageCheck className="w-4 h-4" />
+                {isAdding ? "Queuing Order..." : "Confirm & Move to Processing"}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>

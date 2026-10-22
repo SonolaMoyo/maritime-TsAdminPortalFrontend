@@ -86,7 +86,6 @@ export function ProductsTab() {
             <TableRow key={item.id} className="cursor-pointer hover:bg-[#fcfdfa]">
               <TableCell>
                 <div className="font-bold text-ink text-[14px]">{item.productName}</div>
-                <div className="text-[12px] text-[#8a949d] font-medium">SKU: {item.productId}</div>
               </TableCell>
               <TableCell>
                 <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{item.segment}</span>
@@ -170,7 +169,7 @@ export function ProductsTab() {
           <div className="space-y-6">
             <div>
               <h4 className="font-bold text-ink text-lg">{selectedProduct.productName}</h4>
-              <p className="text-[#8a949d] text-sm">SKU: {selectedProduct.productId} • Warehouse: {selectedProduct.warehouseId}</p>
+              <p className="text-[#8a949d] text-sm">Warehouse: {selectedProduct.warehouseId === "wh-1" ? "Lagos Main Hub" : selectedProduct.warehouseId === "wh-2" ? "Abuja Regional Center" : selectedProduct.warehouseId === "wh-3" ? "Port Harcourt Depot" : selectedProduct.warehouseId}</p>
             </div>
             
             <div className="grid grid-cols-3 gap-4">

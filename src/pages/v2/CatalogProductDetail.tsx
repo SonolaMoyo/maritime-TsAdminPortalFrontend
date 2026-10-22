@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Plus, X, Upload } from "lucide-react";
 import { catalogService } from "../../services/catalogService";
+import { inventoryService } from "../../services/inventoryService";
 import type { CatalogProduct, ProductCategory, Brand, ProductImage, ProductSpecification, ProductDocument } from "../../data/mockCatalog";
+import type { ProductInventory } from "../../data/mockInventory";
 
 export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
   const { id } = useParams();
@@ -10,7 +12,9 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
   const [loading, setLoading] = useState(!isNew);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  
+  const [inventoryProducts, setInventoryProducts] = useState<ProductInventory[]>([]);
+  const [selectedInventoryId, setSelectedInventoryId] = useState<string>("");
+
   const [form, setForm] = useState<Partial<CatalogProduct>>({
     name: "",
     shortDescription: "",
@@ -31,12 +35,14 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
 
   useEffect(() => {
     const loadData = async () => {
-      const [cats, brnds] = await Promise.all([
+      const [cats, brnds, invs] = await Promise.all([
         catalogService.getCategories(),
-        catalogService.getBrands()
+        catalogService.getBrands(),
+        inventoryService.getInventory(),
       ]);
       setCategories(cats);
       setBrands(brnds);
+      setInventoryProducts(invs);
 
       if (!isNew && id) {
         const prod = await catalogService.getProduct(id);
@@ -46,6 +52,11 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
           setImages(prod.images);
           setDocs(prod.docs);
           setStock(prod.stock || 0);
+
+          const matchingInv = invs.find(i => i.productId === prod.id || i.productName.toLowerCase() === prod.name.toLowerCase());
+          if (matchingInv) {
+            setSelectedInventoryId(matchingInv.productId);
+          }
         } else {
           navigate("/catalog");
         }
@@ -55,8 +66,25 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
     loadData();
   }, [id, isNew, navigate]);
 
+  const handleInventorySelect = (productId: string) => {
+    setSelectedInventoryId(productId);
+    const inv = inventoryProducts.find(p => p.productId === productId);
+    if (inv) {
+      setForm(prev => ({
+        ...prev,
+        name: inv.productName,
+        segment: inv.segment,
+      }));
+      setStock(inv.quantity);
+    }
+  };
+
   const handleSave = async (status: 'Draft' | 'Published') => {
-    const dataToSave = { ...form, status };
+    const dataToSave = { 
+      ...form, 
+      id: isNew && selectedInventoryId ? selectedInventoryId : form.id,
+      status 
+    };
     if (isNew) {
       await catalogService.addProduct(dataToSave as any);
       navigate("/catalog");
@@ -107,19 +135,60 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
       <div className="space-y-6 sm:space-y-8">
         {/* 1. Basic Info */}
         <section className="bg-white border border-line rounded-2xl p-4 sm:p-6 shadow-sm">
-          <h2 className="text-[15px] sm:text-[16px] font-bold text-ink mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-line">1. Basic Information</h2>
+          <div className="flex items-center justify-between mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-line">
+            <h2 className="text-[15px] sm:text-[16px] font-bold text-ink">1. Basic Information</h2>
+            {stock > 0 && (
+              <span className="text-[12px] font-bold text-brand-green bg-[#eff5ed] px-3 py-1 rounded-full">
+                {stock} Units in Inventory
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[13px] font-bold text-ink">
+                  Link to Inventory Product *
+                </label>
+                {selectedInventoryId && (
+                  <span className="text-[12px] font-bold text-brand-green flex items-center gap-1">
+                    ✓ Linked to inventory
+                  </span>
+                )}
+              </div>
+              <select
+                value={selectedInventoryId}
+                onChange={e => handleInventorySelect(e.target.value)}
+                className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green bg-white font-medium text-ink"
+              >
+                <option value="">-- Choose Product from Inventory --</option>
+                {inventoryProducts.map(inv => (
+                  <option key={`${inv.id}-${inv.productId}`} value={inv.productId}>
+                    {inv.productName} ({inv.availableQuantity} available • {inv.segment})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[12px] text-[#8a949d] mt-1.5 font-medium">
+                Selecting a product links it directly to warehouse inventory stock, tracking, and segment automatically.
+              </p>
+            </div>
+
+            <div className="md:col-span-2">
               <label className="block text-[13px] font-bold text-ink mb-2">Product Name *</label>
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green" />
+              <input 
+                required 
+                value={form.name || ""} 
+                onChange={e => setForm({...form, name: e.target.value})} 
+                className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green font-semibold text-ink" 
+                placeholder="Product name populated from inventory" 
+              />
             </div>
             <div>
               <label className="block text-[13px] font-bold text-ink mb-2">Short Description</label>
-              <textarea rows={3} value={form.shortDescription} onChange={e => setForm({...form, shortDescription: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green resize-y" />
+              <textarea rows={3} value={form.shortDescription || ""} onChange={e => setForm({...form, shortDescription: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green resize-y" />
             </div>
             <div>
               <label className="block text-[13px] font-bold text-ink mb-2">Full Description</label>
-              <textarea rows={3} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green resize-y" />
+              <textarea rows={3} value={form.description || ""} onChange={e => setForm({...form, description: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green resize-y" />
             </div>
           </div>
         </section>
