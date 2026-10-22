@@ -5,6 +5,7 @@ import { catalogService } from "../../services/catalogService";
 import { inventoryService } from "../../services/inventoryService";
 import type { CatalogProduct, ProductCategory, Brand, ProductImage, ProductSpecification, ProductDocument } from "../../data/mockCatalog";
 import type { ProductInventory } from "../../data/mockInventory";
+import { Select } from "../../components/ui/Select";
 
 export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
   const { id } = useParams();
@@ -155,18 +156,16 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
                   </span>
                 )}
               </div>
-              <select
+              <Select
+                placeholder="-- Choose Product from Inventory --"
+                options={inventoryProducts.map(inv => ({
+                  value: inv.productId,
+                  label: inv.productName,
+                  sublabel: `${inv.availableQuantity} available • ${inv.segment}`,
+                }))}
                 value={selectedInventoryId}
-                onChange={e => handleInventorySelect(e.target.value)}
-                className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green bg-white font-medium text-ink"
-              >
-                <option value="">-- Choose Product from Inventory --</option>
-                {inventoryProducts.map(inv => (
-                  <option key={`${inv.id}-${inv.productId}`} value={inv.productId}>
-                    {inv.productName} ({inv.availableQuantity} available • {inv.segment})
-                  </option>
-                ))}
-              </select>
+                onChange={val => handleInventorySelect(val)}
+              />
               <p className="text-[12px] text-[#8a949d] mt-1.5 font-medium">
                 Selecting a product links it directly to warehouse inventory stock, tracking, and segment automatically.
               </p>
@@ -198,31 +197,38 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
           <h2 className="text-[16px] font-bold text-ink mb-6 pb-4 border-b border-line">2. Classification</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-[13px] font-bold text-ink mb-2">Segment *</label>
-              <select value={form.segment} onChange={e => setForm({...form, segment: e.target.value as any})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green bg-white">
-                <option value="Solar Tech">Solar Tech</option>
-                <option value="Luxe">Luxe</option>
-                <option value="EV">EV</option>
-                <option value="Electronics">Electronics</option>
-              </select>
+              <Select
+                label="Segment"
+                required
+                options={["Solar Tech", "Luxe", "EV", "Electronics"]}
+                value={form.segment}
+                onChange={val => setForm({...form, segment: val as any})}
+              />
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-ink mb-2">Category *</label>
-              <select value={form.categoryId} onChange={e => setForm({...form, categoryId: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green bg-white">
-                <option value="">Select Category...</option>
-                {categories.filter(c => c.segment === form.segment).map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              <Select
+                label="Category"
+                required
+                placeholder="Select Category..."
+                options={categories.filter(c => c.segment === form.segment).map(c => ({
+                  value: c.id,
+                  label: c.name,
+                }))}
+                value={form.categoryId}
+                onChange={val => setForm({...form, categoryId: val})}
+              />
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-ink mb-2">Brand</label>
-              <select value={form.brandId} onChange={e => setForm({...form, brandId: e.target.value})} className="w-full border border-line rounded-lg px-4 py-3 text-[14px] focus:outline-brand-green bg-white">
-                <option value="">Select Brand...</option>
-                {brands.filter(b => b.segments.includes(form.segment as string)).map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+              <Select
+                label="Brand"
+                placeholder="Select Brand..."
+                options={brands.filter(b => b.segments.includes(form.segment as string)).map(b => ({
+                  value: b.id,
+                  label: b.name,
+                }))}
+                value={form.brandId}
+                onChange={val => setForm({...form, brandId: val})}
+              />
             </div>
           </div>
         </section>

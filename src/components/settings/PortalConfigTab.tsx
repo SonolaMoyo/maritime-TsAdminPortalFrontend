@@ -1,4 +1,10 @@
+import { useState } from "react";
+import { Select } from "../ui/Select";
+
 export function PortalConfigTab() {
+  const [siteStatus, setSiteStatus] = useState("Live");
+  const [defaultReqStatus, setDefaultReqStatus] = useState("New");
+
   return (
     <div className="bg-white border border-line rounded-2xl p-6">
       <h2 className="text-xl font-black text-ink mb-6">Portal Configuration</h2>
@@ -8,14 +14,18 @@ export function PortalConfigTab() {
           <h3 className="text-sm font-bold text-ink uppercase tracking-wider mb-4 pb-2 border-b border-line">Public Website</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
             <div className="space-y-4">
-              <label className="flex items-center justify-between p-3 border border-line rounded-xl hover:border-brand-green transition-colors cursor-pointer">
-                <span className="text-sm font-bold text-ink">Website Status</span>
-                <select className="px-2 py-1 bg-[#f4f7f4] text-brand-green font-bold text-xs rounded border border-transparent focus:outline-none focus:border-brand-green">
-                  <option>Live</option>
-                  <option>Maintenance</option>
-                  <option>Offline</option>
-                </select>
-              </label>
+              <div className="flex items-center justify-between p-3 border border-line rounded-xl bg-white gap-3">
+                <span className="text-sm font-bold text-ink whitespace-nowrap">Website Status</span>
+                <div className="w-36">
+                  <Select
+                    options={["Live", "Maintenance", "Offline"]}
+                    value={siteStatus}
+                    onChange={setSiteStatus}
+                    searchable={false}
+                    buttonClassName="py-1 px-2.5 text-xs font-bold text-brand-green bg-[#f4f7f4]"
+                  />
+                </div>
+              </div>
               <label className="flex items-center justify-between p-3 border border-line rounded-xl hover:border-brand-green transition-colors cursor-pointer bg-[#fcfdfa]">
                 <span className="text-sm font-bold text-ink">Allow Quote Requests</span>
                 <input type="checkbox" defaultChecked className="rounded border-line text-brand-green focus:ring-brand-green w-4 h-4" />
@@ -64,12 +74,12 @@ export function PortalConfigTab() {
             </label>
             
             <div className="pt-4 mt-4 border-t border-dashed border-line">
-              <label className="block text-sm font-bold text-ink mb-1.5">Default Request Status</label>
-              <select className="w-full px-3 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green">
-                <option>New</option>
-                <option>Pending</option>
-                <option>Assigned</option>
-              </select>
+              <Select
+                label="Default Request Status"
+                options={["New", "Pending", "Assigned"]}
+                value={defaultReqStatus}
+                onChange={setDefaultReqStatus}
+              />
             </div>
           </div>
         </section>

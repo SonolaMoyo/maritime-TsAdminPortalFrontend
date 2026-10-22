@@ -6,6 +6,7 @@ import { useSegment } from "../../context/SegmentContext";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Search, Plus, Trash2 } from "lucide-react";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 
 export function ProductsTab() {
   const { segment } = useSegment();
@@ -137,19 +138,20 @@ export function ProductsTab() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment</label>
-              <select value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as any})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                <option value="Solar Tech">Solar Tech</option>
-                <option value="Luxe">Luxe</option>
-                <option value="EV">EV</option>
-                <option value="Electronics">Electronics</option>
-              </select>
+              <Select
+                label="Segment"
+                options={["Solar Tech", "Luxe", "EV", "Electronics"]}
+                value={addForm.segment}
+                onChange={val => setAddForm({...addForm, segment: val as any})}
+              />
             </div>
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Warehouse</label>
-              <select value={addForm.warehouseId} onChange={e => setAddForm({...addForm, warehouseId: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                {mockWarehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-              </select>
+              <Select
+                label="Warehouse"
+                options={mockWarehouses.map(w => ({ value: w.id, label: w.name, sublabel: w.location }))}
+                value={addForm.warehouseId}
+                onChange={val => setAddForm({...addForm, warehouseId: val})}
+              />
             </div>
           </div>
           <div>

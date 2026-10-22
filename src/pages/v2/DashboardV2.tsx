@@ -5,6 +5,7 @@ import {
   Calendar, TrendingUp, ChevronRight
 } from "lucide-react";
 import { Panel } from "../../components/ui/Card";
+import { Select } from "../../components/ui/Select";
 import { useSegment } from "../../context/SegmentContext";
 
 // Months configuration
@@ -315,26 +316,26 @@ export function DashboardV2() {
           </div>
 
           {/* Month Selector */}
-          <select 
-            value={selectedMonth} 
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="flex-1 sm:flex-none h-[38px] px-2.5 sm:px-3 rounded-xl border border-line bg-[#fcfdfa] text-xs sm:text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
-          >
-            {MONTHS.map(m => (
-              <option key={m.value} value={m.value}>{m.label}</option>
-            ))}
-          </select>
+          <div className="flex-1 sm:w-[200px]">
+            <Select 
+              searchable={true}
+              value={selectedMonth} 
+              onChange={(val) => setSelectedMonth(val)}
+              options={MONTHS}
+              buttonClassName="h-[38px] rounded-xl text-xs sm:text-sm font-bold bg-[#fcfdfa]"
+            />
+          </div>
 
           {/* Year Selector */}
-          <select 
-            value={selectedYear} 
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="h-[38px] px-2.5 sm:px-3 rounded-xl border border-line bg-[#fcfdfa] text-xs sm:text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
-          >
-            {YEARS.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
+          <div className="w-[110px]">
+            <Select 
+              searchable={false}
+              value={selectedYear} 
+              onChange={(val) => setSelectedYear(val)}
+              options={YEARS}
+              buttonClassName="h-[38px] rounded-xl text-xs sm:text-sm font-bold bg-[#fcfdfa]"
+            />
+          </div>
 
           {(selectedMonth !== "10" || selectedYear !== "2026") && (
             <button

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { StatusPill } from "../ui/StatusPill";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 
 export function SegmentsTab() {
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -76,11 +77,12 @@ export function SegmentsTab() {
                 <textarea className="w-full px-3 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green h-20 resize-none" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-ink mb-1.5">Status</label>
-                <select className="w-full px-3 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green">
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
+                <Select
+                  label="Status"
+                  options={["Active", "Inactive"]}
+                  defaultValue={selectedSegment.status}
+                  onChange={() => {}}
+                />
               </div>
             </div>
 

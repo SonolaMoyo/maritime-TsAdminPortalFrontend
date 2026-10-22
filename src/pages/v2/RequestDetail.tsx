@@ -6,6 +6,7 @@ import type { QuoteRequest, RequestStatus } from "../../data/mockRequests";
 import { Panel } from "../../components/ui/Card";
 import { StatusPill } from "../../components/ui/StatusPill";
 import { Modal } from "../../components/ui/Modal";
+import { Select } from "../../components/ui/Select";
 
 export function RequestDetail() {
   const { id } = useParams();
@@ -299,13 +300,12 @@ export function RequestDetail() {
       <Modal isOpen={activeModal === "assign"} onClose={() => setActiveModal(null)} title="Assign Request">
         <form onSubmit={handleAssign} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Select Sales Representative</label>
-            <select value={assignee} onChange={e => setAssignee(e.target.value)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option>John Doe</option>
-              <option>Sarah Smith</option>
-              <option>David Williams</option>
-              <option>Moyo</option>
-            </select>
+            <Select
+              label="Select Sales Representative"
+              options={["John Doe", "Sarah Smith", "David Williams", "Moyo"]}
+              value={assignee}
+              onChange={val => setAssignee(val)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>
@@ -317,16 +317,12 @@ export function RequestDetail() {
       <Modal isOpen={activeModal === "status"} onClose={() => setActiveModal(null)} title="Change Status">
         <form onSubmit={handleStatus} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">New Status</label>
-            <select value={newStatus} onChange={e => setNewStatus(e.target.value as RequestStatus)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="New">New</option>
-              <option value="Assigned">Assigned</option>
-              <option value="Contacted">Contacted</option>
-              <option value="Quote Sent">Quote Sent</option>
-              <option value="Negotiation">Negotiation</option>
-              <option value="Won">Won</option>
-              <option value="Lost">Lost</option>
-            </select>
+            <Select
+              label="New Status"
+              options={["New", "Assigned", "Contacted", "Quote Sent", "Negotiation", "Won", "Lost"]}
+              value={newStatus}
+              onChange={val => setNewStatus(val as RequestStatus)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>
@@ -362,11 +358,15 @@ export function RequestDetail() {
         <form onSubmit={handleDone} className="space-y-4">
           <p className="text-sm text-ink mb-4">Did you win or lose this sales opportunity?</p>
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Resolution</label>
-            <select value={newStatus} onChange={e => setNewStatus(e.target.value as RequestStatus)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="Won">Closed - Won</option>
-              <option value="Lost">Closed - Lost</option>
-            </select>
+            <Select
+              label="Resolution"
+              options={[
+                { value: "Won", label: "Closed - Won" },
+                { value: "Lost", label: "Closed - Lost" },
+              ]}
+              value={newStatus}
+              onChange={val => setNewStatus(val as RequestStatus)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>

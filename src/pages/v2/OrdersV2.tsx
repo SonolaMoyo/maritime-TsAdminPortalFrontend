@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Filter, CheckCircle2, PackageCheck, Truck, Clock, ArrowRight, ShieldCheck, Trash2 } from "lucide-react";
+import { Plus, Search, Filter, CheckCircle2, PackageCheck, Truck, Clock, ArrowRight, Trash2 } from "lucide-react";
 import { Table, TableRow, TableCell } from "../../components/ui/Table";
 import { StatusPill } from "../../components/ui/StatusPill";
 import { ordersService } from "../../services/ordersService";
@@ -10,6 +10,7 @@ import type { Order, SegmentType, OrderStatus } from "../../data/mockOrders";
 import { useSegment } from "../../context/SegmentContext";
 import { MetricCard } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
+import { Select } from "../../components/ui/Select";
 
 const TABS: Array<"All" | OrderStatus> = [
   "All",
@@ -373,14 +374,14 @@ export function OrdersV2() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl font-[800] text-[13px] whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-[800] text-[13px] whitespace-nowrap transition-all border ${
                   isActive 
-                    ? "bg-brand-green text-white shadow-sm" 
-                    : "text-[#5b6671] hover:bg-[#f0f4f1] hover:text-ink cursor-pointer"
+                    ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20" 
+                    : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
                 }`}
               >
                 <span>{tab}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[11px] font-black ${
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
                   isActive ? "bg-white/20 text-white" : "bg-[#e5eee3] text-[#5b6671]"
                 }`}>
                   {count}
@@ -415,7 +416,7 @@ export function OrdersV2() {
             <Clock className="w-5 h-5 animate-spin text-brand-green" /> Loading operational orders...
           </div>
         ) : (
-          <Table headers={["Order ID", "Customer & Segment", "Items & Value", "Payment Verification", "Fulfillment Stage", "Logistics Status", "Date", "Action"]}>
+          <Table headers={["Order ID", "Customer & Segment", "Items & Value", "Fulfillment Stage", "Logistics Status", "Date", "Action"]}>
             {finalFiltered.map((order) => {
               const totalItems = order.items.reduce((sum, i) => sum + i.quantity, 0);
               const totalAllocated = order.items.reduce((sum, i) => sum + i.allocatedQuantity, 0);
@@ -441,18 +442,6 @@ export function OrdersV2() {
                     <div className="text-[12px] text-[#5b6671] font-medium">
                       {totalItems} {totalItems === 1 ? "unit" : "units"} ({order.items.length} {order.items.length === 1 ? "line item" : "line items"})
                     </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#eff5ed] text-brand-green text-[12px] font-bold">
-                      <ShieldCheck className="w-3.5 h-3.5 text-brand-green" />
-                      <span>Paid • {order.payment.method}</span>
-                    </div>
-                    {order.payment.reference && (
-                      <div className="text-[11px] font-mono text-[#8a949d] mt-1 pl-1">
-                        Ref: {order.payment.reference}
-                      </div>
-                    )}
                   </TableCell>
 
                   <TableCell>
@@ -506,7 +495,7 @@ export function OrdersV2() {
       </div>
 
       {/* Create Order Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Create Confirmed Order">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Create Confirmed Order" size="md">
         <form onSubmit={handleAddSubmit} className="space-y-4">
           <div className="bg-[#eff5ed] border border-[#d2ff2f]/50 p-3 rounded-xl flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-brand-green flex-shrink-0" />
@@ -538,13 +527,13 @@ export function OrdersV2() {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
-              <select required value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as SegmentType})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                <option value="Solar Tech">Solar Tech</option>
-                <option value="Luxe">Luxe</option>
-                <option value="EV">EV</option>
-                <option value="Electronics">Electronics</option>
-              </select>
+              <Select
+                label="Segment"
+                required
+                options={["Solar Tech", "Luxe", "EV", "Electronics"]}
+                value={addForm.segment}
+                onChange={val => setAddForm({...addForm, segment: val as SegmentType})}
+              />
             </div>
 
             {/* Multiple Product Selection linked to Inventory */}
@@ -579,20 +568,18 @@ export function OrdersV2() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div className="sm:col-span-6">
-                      <label className="block text-[11px] font-bold text-[#8a949d] mb-1">Select Inventory Product *</label>
-                      <select
+                      <Select
+                        label="Select Inventory Product"
                         required
+                        placeholder="-- Choose Product from Inventory --"
+                        options={inventoryProducts.map(p => ({
+                          value: p.productId,
+                          label: p.productName,
+                          sublabel: `${p.availableQuantity} available • ${p.segment}`,
+                        }))}
                         value={item.productId}
-                        onChange={e => handleItemProductChange(index, e.target.value)}
-                        className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white font-medium text-ink"
-                      >
-                        <option value="">-- Choose Product from Inventory --</option>
-                        {inventoryProducts.map(p => (
-                          <option key={`${p.id}-${p.productId}`} value={p.productId}>
-                            {p.productName} ({p.availableQuantity} available • {p.segment})
-                          </option>
-                        ))}
-                      </select>
+                        onChange={val => handleItemProductChange(index, val)}
+                      />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -641,14 +628,13 @@ export function OrdersV2() {
             {/* Payment & Delivery Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Method *</label>
-                <select value={addForm.paymentMethod} onChange={e => setAddForm({...addForm, paymentMethod: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Credit Card">Credit Card</option>
-                  <option value="Corporate Transfer">Corporate Transfer</option>
-                  <option value="Direct Deposit">Direct Deposit</option>
-                  <option value="POS / Cash">POS / Cash</option>
-                </select>
+                <Select
+                  label="Payment Method"
+                  required
+                  options={["Bank Transfer", "Credit Card", "Corporate Transfer", "Direct Deposit", "POS / Cash"]}
+                  value={addForm.paymentMethod}
+                  onChange={val => setAddForm({...addForm, paymentMethod: val})}
+                />
               </div>
               <div>
                 <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Payment Reference *</label>

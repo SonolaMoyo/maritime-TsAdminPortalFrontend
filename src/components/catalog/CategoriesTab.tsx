@@ -4,6 +4,7 @@ import type { ProductCategory } from "../../data/mockCatalog";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 
 export function CategoriesTab() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -77,20 +78,21 @@ export function CategoriesTab() {
             <input required value={addForm.name} onChange={e => setAddForm({ ...addForm, name: e.target.value })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green" />
           </div>
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
-            <select value={addForm.segment} onChange={e => setAddForm({ ...addForm, segment: e.target.value as any })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="Solar Tech">Solar Tech</option>
-              <option value="Luxe">Luxe</option>
-              <option value="EV">EV</option>
-              <option value="Electronics">Electronics</option>
-            </select>
+            <Select
+              label="Segment"
+              required
+              options={["Solar Tech", "Luxe", "EV", "Electronics"]}
+              value={addForm.segment}
+              onChange={val => setAddForm({ ...addForm, segment: val as any })}
+            />
           </div>
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Status</label>
-            <select value={addForm.status} onChange={e => setAddForm({ ...addForm, status: e.target.value as any })} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
+            <Select
+              label="Status"
+              options={["Active", "Inactive"]}
+              value={addForm.status}
+              onChange={val => setAddForm({ ...addForm, status: val as any })}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>

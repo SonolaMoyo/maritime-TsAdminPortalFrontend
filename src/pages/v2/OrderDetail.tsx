@@ -9,6 +9,7 @@ import type { Order, OrderStatus } from "../../data/mockOrders";
 import { Panel } from "../../components/ui/Card";
 import { StatusPill } from "../../components/ui/StatusPill";
 import { Modal } from "../../components/ui/Modal";
+import { Select } from "../../components/ui/Select";
 
 const LIFECYCLE_STAGES: OrderStatus[] = [
   "Processing",
@@ -661,14 +662,19 @@ export function OrderDetail() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Carrier / Logistics *</label>
-              <select value={carrier} onChange={e => setCarrier(e.target.value)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                <option value="Company Delivery">Company Fleet Delivery</option>
-                <option value="DHL Express">DHL Express</option>
-                <option value="FedEx">FedEx</option>
-                <option value="GIG Logistics">GIG Logistics</option>
-                <option value="Local Courier">Local Haulage Partner</option>
-              </select>
+              <Select
+                label="Carrier / Logistics"
+                required
+                options={[
+                  "Company Fleet Delivery",
+                  "DHL Express",
+                  "FedEx",
+                  "GIG Logistics",
+                  "Local Haulage Partner"
+                ]}
+                value={carrier}
+                onChange={val => setCarrier(val)}
+              />
             </div>
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Tracking Code / Ref *</label>
@@ -742,13 +748,18 @@ export function OrderDetail() {
             Warning: Cancelling this order halts fulfillment. If payment refund is required, please log in Finance.
           </p>
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Reason for Cancellation *</label>
-            <select value={cancelReason} onChange={e => setCancelReason(e.target.value)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="Customer requested cancellation">Customer requested cancellation</option>
-              <option value="Duplicate order entry">Duplicate order entry</option>
-              <option value="Item discontinued / Out of stock">Item discontinued / Out of stock</option>
-              <option value="Pricing / Specification discrepancy">Pricing / Specification discrepancy</option>
-            </select>
+            <Select
+              label="Reason for Cancellation"
+              required
+              options={[
+                "Customer requested cancellation",
+                "Duplicate order entry",
+                "Item discontinued / Out of stock",
+                "Pricing / Specification discrepancy"
+              ]}
+              value={cancelReason}
+              onChange={val => setCancelReason(val)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">
@@ -768,15 +779,13 @@ export function OrderDetail() {
             Notice: Manually overriding status bypasses standard operational validations.
           </p>
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">New Order Stage</label>
-            <select 
-              value={newStatus} 
-              onChange={e => setNewStatus(e.target.value as OrderStatus)} 
-              className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white"
-            >
-              {LIFECYCLE_STAGES.map(s => <option key={s} value={s}>{s}</option>)}
-              <option value="Cancelled">Cancelled</option>
-            </select>
+            <Select
+              label="New Order Stage"
+              required
+              options={[...LIFECYCLE_STAGES, "Cancelled"]}
+              value={newStatus}
+              onChange={val => setNewStatus(val as OrderStatus)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setActiveModal(null)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa] cursor-pointer">

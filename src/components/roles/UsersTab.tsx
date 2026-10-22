@@ -5,6 +5,7 @@ import { Modal } from "../ui/Modal";
 import { mockUsers } from "../../data/mockRoles";
 import type { User } from "../../data/mockRoles";
 import { Search, Filter, Plus } from "lucide-react";
+import { Select } from "../ui/Select";
 
 export function UsersTab() {
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -117,17 +118,13 @@ export function UsersTab() {
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-ink mb-1.5">Role *</label>
-            <select
+            <Select
+              label="Role"
+              required
+              options={["Administrator", "Sales", "Inventory", "Content Manager"]}
               value={addForm.role}
-              onChange={e => setAddForm({...addForm, role: e.target.value})}
-              className="w-full px-3 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green"
-            >
-              <option value="Administrator">Administrator</option>
-              <option value="Sales">Sales</option>
-              <option value="Inventory">Inventory</option>
-              <option value="Content Manager">Content Manager</option>
-            </select>
+              onChange={val => setAddForm({...addForm, role: val})}
+            />
           </div>
           <div className="flex items-center gap-2 mt-2">
             <input type="checkbox" id="sendInvite" defaultChecked className="rounded border-line text-brand-green focus:ring-brand-green" />

@@ -18,15 +18,15 @@ export function RolesPermissions() {
         </div>
       </div>
 
-      <div className="flex overflow-x-auto gap-4 sm:gap-6 border-b border-[#e4ece2] mb-6 pb-1">
+      <div className="flex overflow-x-auto gap-2 border-b border-[#e4ece2] mb-6 pb-3">
         {["Users", "Roles", "Permissions", "Activity / Audit Log"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 text-[14px] font-[800] transition-all whitespace-nowrap ${
+            className={`px-4 py-2 rounded-xl font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-all border ${
               activeTab === tab
-                ? "text-brand-green border-b-2 border-brand-green"
-                : "text-[#8a949d] hover:text-ink"
+                ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20"
+                : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
             }`}
           >
             {tab}

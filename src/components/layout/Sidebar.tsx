@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useSegment } from "../../context/SegmentContext";
 import type { ExtendedSegmentType } from "../../context/SegmentContext";
+import { Select } from "../ui/Select";
 
 interface SidebarProps {
   mobileOpen?: boolean;
@@ -110,17 +111,12 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       {/* Segment Selector */}
       <div className="px-4 py-3 border-b border-[#e4ece2]">
         <label className="text-xs font-semibold text-[#8a949d] uppercase tracking-wider mb-1.5 block">Segment:</label>
-        <select 
+        <Select 
           value={segment}
-          onChange={(e) => setSegment(e.target.value as ExtendedSegmentType)}
-          className="w-full bg-[#f8faf9] border border-line rounded-lg px-2.5 py-2 text-sm font-bold text-ink focus:outline-none focus:border-brand-green cursor-pointer"
-        >
-          <option value="All">All</option>
-          <option value="Solar Tech">Solar Tech</option>
-          <option value="Luxe">Luxe</option>
-          <option value="EV">EV</option>
-          <option value="Electronics">Electronics</option>
-        </select>
+          onChange={(val) => setSegment(val as ExtendedSegmentType)}
+          options={["All", "Solar Tech", "Luxe", "EV", "Electronics"]}
+          buttonClassName="bg-[#f8faf9] py-2 font-bold text-ink"
+        />
       </div>
 
       {/* Primary Navigation */}

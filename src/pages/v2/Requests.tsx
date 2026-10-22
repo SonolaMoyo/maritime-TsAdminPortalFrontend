@@ -8,6 +8,7 @@ import type { QuoteRequest, SegmentType } from "../../data/mockRequests";
 import { useSegment } from "../../context/SegmentContext";
 import { MetricCard } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
+import { Select } from "../../components/ui/Select";
 
 export function Requests() {
   const navigate = useNavigate();
@@ -113,13 +114,15 @@ export function Requests() {
 
       {/* Tabs & Search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-b border-[#e4ece2] pb-4">
-        <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {["All", "Pending", "In Progress", "Completed"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 -mb-3.5 font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-colors border-b-[3px] ${
-                activeTab === tab ? "border-brand-green text-brand-green" : "border-transparent text-[#8a949d] hover:text-ink cursor-pointer"
+              className={`px-4 py-2 rounded-xl font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-all border ${
+                activeTab === tab 
+                  ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20" 
+                  : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
               }`}
             >
               {tab}
@@ -226,13 +229,13 @@ export function Requests() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Segment *</label>
-              <select required value={addForm.segment} onChange={e => setAddForm({...addForm, segment: e.target.value as SegmentType})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                <option value="Solar Tech">Solar Tech</option>
-                <option value="Luxe">Luxe</option>
-                <option value="EV">EV</option>
-                <option value="Electronics">Electronics</option>
-              </select>
+              <Select
+                label="Segment"
+                required
+                options={["Solar Tech", "Luxe", "EV", "Electronics"]}
+                value={addForm.segment}
+                onChange={val => setAddForm({...addForm, segment: val as SegmentType})}
+              />
             </div>
             <div>
               <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Product *</label>

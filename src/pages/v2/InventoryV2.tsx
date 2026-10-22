@@ -7,6 +7,7 @@ import { WarehousesTab } from "../../components/inventory/WarehousesTab";
 import { TransfersTab } from "../../components/inventory/TransfersTab";
 import { SuppliersTab } from "../../components/inventory/SuppliersTab";
 import { Modal } from "../../components/ui/Modal";
+import { Select } from "../../components/ui/Select";
 import { inventoryService } from "../../services/inventoryService";
 import { mockInventory, mockWarehouses } from "../../data/mockInventory";
 
@@ -98,13 +99,15 @@ export function InventoryV2() {
         </div>
       </div>
 
-      <div className="flex overflow-x-auto gap-4 sm:gap-6 border-b border-[#e4ece2] mb-6 pb-1">
+      <div className="flex overflow-x-auto gap-2 border-b border-[#e4ece2] mb-6 pb-3">
         {["Overview", "Products", "Warehouses", "Transfers", "Suppliers", "Reports"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-colors border-b-[3px] -mb-[1.5px] ${
-              activeTab === tab ? "border-brand-green text-brand-green" : "border-transparent text-[#8a949d] hover:text-ink cursor-pointer"
+            className={`px-4 py-2 rounded-xl font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-all border ${
+              activeTab === tab
+                ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20"
+                : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
             }`}
           >
             {tab}
@@ -124,22 +127,20 @@ export function InventoryV2() {
       <Modal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)} title="Receive Inventory">
         <form onSubmit={handleReceiveSubmit} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Product Inventory Record *</label>
-            <select 
+            <Select 
+              label="Product Inventory Record"
               required 
               value={receiveForm.inventoryId} 
-              onChange={e => setReceiveForm({...receiveForm, inventoryId: e.target.value})} 
-              className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white"
-            >
-              {mockInventory.map(inv => {
+              onChange={val => setReceiveForm({...receiveForm, inventoryId: val})} 
+              options={mockInventory.map(inv => {
                 const wh = mockWarehouses.find(w => w.id === inv.warehouseId);
-                return (
-                  <option key={inv.id} value={inv.id}>
-                    {inv.productName} ({inv.segment}) — Warehouse: {wh?.name || inv.warehouseId}
-                  </option>
-                );
+                return {
+                  value: inv.id,
+                  label: `${inv.productName} (${inv.segment})`,
+                  sublabel: `Warehouse: ${wh?.name || inv.warehouseId}`,
+                };
               })}
-            </select>
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -163,37 +164,45 @@ export function InventoryV2() {
       <Modal isOpen={isTransferModalOpen} onClose={() => setIsTransferModalOpen(false)} title="Transfer Stock">
         <form onSubmit={handleTransferSubmit} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Product *</label>
-            <select 
+            <Select 
+              label="Product"
               required 
               value={transferForm.productId} 
-              onChange={e => {
-                const prod = mockInventory.find(i => i.productId === e.target.value);
-                setTransferForm({...transferForm, productId: e.target.value, productName: prod?.productName || ""});
+              onChange={val => {
+                const prod = mockInventory.find(i => i.productId === val);
+                setTransferForm({...transferForm, productId: val, productName: prod?.productName || ""});
               }} 
-              className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white"
-            >
-              {Array.from(new Set(mockInventory.map(i => i.productId))).map(pId => {
+              options={Array.from(new Set(mockInventory.map(i => i.productId))).map(pId => {
                 const prod = mockInventory.find(i => i.productId === pId);
-                return <option key={pId} value={pId}>{prod?.productName}</option>;
+                return {
+                  value: pId,
+                  label: prod?.productName || pId,
+                  sublabel: prod?.segment,
+                };
               })}
-            </select>
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-3 items-end">
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">From Warehouse *</label>
-              <select required value={transferForm.fromWarehouseId} onChange={e => setTransferForm({...transferForm, fromWarehouseId: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                {mockWarehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-              </select>
+              <Select 
+                label="From Warehouse"
+                required 
+                value={transferForm.fromWarehouseId} 
+                onChange={val => setTransferForm({...transferForm, fromWarehouseId: val})} 
+                options={mockWarehouses.map(w => ({ value: w.id, label: w.name, sublabel: w.location }))}
+              />
             </div>
             <div className="hidden sm:block pb-2 text-[#8a949d] text-center">
               <ArrowRight className="w-4 h-4 mx-auto" />
             </div>
             <div>
-              <label className="block text-[12px] font-bold text-[#8a949d] mb-1">To Warehouse *</label>
-              <select required value={transferForm.toWarehouseId} onChange={e => setTransferForm({...transferForm, toWarehouseId: e.target.value})} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-                {mockWarehouses.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
-              </select>
+              <Select 
+                label="To Warehouse"
+                required 
+                value={transferForm.toWarehouseId} 
+                onChange={val => setTransferForm({...transferForm, toWarehouseId: val})} 
+                options={mockWarehouses.map(w => ({ value: w.id, label: w.name, sublabel: w.location }))}
+              />
             </div>
           </div>
           <div>

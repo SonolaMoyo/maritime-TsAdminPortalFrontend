@@ -4,6 +4,7 @@ import type { CatalogProduct } from "../../data/mockCatalog";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus, GripVertical } from "lucide-react";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 
 export function FeaturedTab() {
   const [featuredProducts, setFeaturedProducts] = useState<CatalogProduct[]>([]);
@@ -99,13 +100,18 @@ export function FeaturedTab() {
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add Featured Product">
         <form onSubmit={handleAdd} className="space-y-4">
           <div>
-            <label className="block text-[12px] font-bold text-[#8a949d] mb-1">Select Product</label>
-            <select required value={selectedProductId} onChange={e => setSelectedProductId(e.target.value)} className="w-full border border-line rounded-lg px-3 py-2 text-sm focus:outline-brand-green bg-white">
-              <option value="" disabled>Select a product...</option>
-              {allProducts.filter(p => !p.isFeatured).map(p => (
-                <option key={p.id} value={p.id}>{p.name} ({p.segment})</option>
-              ))}
-            </select>
+            <Select
+              label="Select Product"
+              required
+              placeholder="Select a product..."
+              options={allProducts.filter(p => !p.isFeatured).map(p => ({
+                value: p.id,
+                label: p.name,
+                sublabel: p.segment,
+              }))}
+              value={selectedProductId}
+              onChange={val => setSelectedProductId(val)}
+            />
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 rounded-full border border-line text-sm font-bold text-ink hover:bg-[#fcfdfa]">Cancel</button>
