@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
 import { StatusPill } from "../components/ui/StatusPill";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Distribution() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+  const paginatedDistribution = demo.distribution.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex justify-between items-start gap-5 mb-6">
@@ -15,7 +21,7 @@ export function Distribution() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Destination", "Product", "Quantity", "From Branch", "Status", "Assigned Staff"]}>
-          {demo.distribution.map(dist => (
+          {paginatedDistribution.map(dist => (
             <TableRow key={dist.id}>
               <TableCell><b className="block">{dist.destination}</b></TableCell>
               <TableCell>{dist.product_summary}</TableCell>
@@ -26,6 +32,12 @@ export function Distribution() {
             </TableRow>
           ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={demo.distribution.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );

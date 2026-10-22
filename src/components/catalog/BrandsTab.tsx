@@ -4,10 +4,12 @@ import type { Brand } from "../../data/mockCatalog";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
 
 export function BrandsTab() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", description: "", website: "" });
@@ -41,41 +43,49 @@ export function BrandsTab() {
       {loading ? (
         <div className="p-12 text-center text-[#8a949d] font-semibold">Loading brands...</div>
       ) : (
-        <Table headers={["Brand", "Products", "Segments", "Status", "Action"]}>
-          {brands.map((br) => (
-            <TableRow key={br.id} className="cursor-pointer hover:bg-[#fcfdfa]">
-              <TableCell>
-                <div className="font-bold text-ink text-[14px]">{br.name}</div>
-                {br.website && <div className="text-[12px] text-brand-green">{br.website}</div>}
-              </TableCell>
-              <TableCell><div className="font-black text-ink">{br.productCount}</div></TableCell>
-              <TableCell>
-                <div className="flex gap-1 flex-wrap">
-                  {br.segments.map(seg => (
-                    <span key={seg} className="text-[12px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-0.5 rounded">{seg}</span>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
-                  br.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
-                }`}>
-                  {br.status}
-                </div>
-              </TableCell>
-              <TableCell>
-                <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
-                  Edit
-                </button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {brands.length === 0 && (
-            <TableRow>
-              <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No brands found.</div></TableCell>
-            </TableRow>
-          )}
-        </Table>
+        <>
+          <Table headers={["Brand", "Products", "Segments", "Status", "Action"]}>
+            {brands.slice((currentPage - 1) * 5, currentPage * 5).map((br) => (
+              <TableRow key={br.id} className="cursor-pointer hover:bg-[#fcfdfa]">
+                <TableCell>
+                  <div className="font-bold text-ink text-[14px]">{br.name}</div>
+                  {br.website && <div className="text-[12px] text-brand-green">{br.website}</div>}
+                </TableCell>
+                <TableCell><div className="font-black text-ink">{br.productCount}</div></TableCell>
+                <TableCell>
+                  <div className="flex gap-1 flex-wrap">
+                    {br.segments.map(seg => (
+                      <span key={seg} className="text-[12px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-0.5 rounded">{seg}</span>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
+                    br.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
+                  }`}>
+                    {br.status}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
+                    Edit
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {brands.length === 0 && (
+              <TableRow>
+                <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No brands found.</div></TableCell>
+              </TableRow>
+            )}
+          </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={brands.length}
+            pageSize={5}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add Brand">

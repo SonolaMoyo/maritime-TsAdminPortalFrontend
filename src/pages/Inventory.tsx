@@ -1,9 +1,20 @@
+import { useState, useMemo } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
 import { StatusPill } from "../components/ui/StatusPill";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Inventory() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  const totalPages = Math.ceil(demo.products.length / pageSize) || 1;
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return demo.products.slice(start, start + pageSize);
+  }, [currentPage, pageSize]);
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex justify-between items-start gap-5 mb-6">
@@ -15,7 +26,7 @@ export function Inventory() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Product", "Brand", "Category", "Stock", "Reserved", "Available", "Status", "Warehouse"]}>
-          {demo.products.map(product => {
+          {paginatedProducts.map(product => {
             const available = Math.max(product.stock_quantity - product.reserved_quantity, 0);
             return (
               <TableRow key={product.id}>
@@ -31,6 +42,13 @@ export function Inventory() {
             );
           })}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={demo.products.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );

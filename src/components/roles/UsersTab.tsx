@@ -6,10 +6,12 @@ import { mockUsers } from "../../data/mockRoles";
 import type { User } from "../../data/mockRoles";
 import { Search, Filter, Plus } from "lucide-react";
 import { Select } from "../ui/Select";
+import { Pagination } from "../ui/Pagination";
 
 export function UsersTab() {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   
@@ -20,6 +22,9 @@ export function UsersTab() {
     u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pageSize = 5;
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +49,10 @@ export function UsersTab() {
               type="text" 
               placeholder="Search users..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full pl-9 pr-4 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green"
             />
           </div>
@@ -62,9 +70,9 @@ export function UsersTab() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-line overflow-hidden">
+      <div className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
         <Table headers={["User", "Email", "Role", "Status", "Last Active", "Created", "Action"]}>
-            {filteredUsers.map((user) => (
+            {paginatedUsers.map((user) => (
               <TableRow key={user.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => setSelectedUser(user)}>
                 <TableCell className="font-bold text-ink">{user.name}</TableCell>
                 <TableCell className="text-[#5b6671]">{user.email}</TableCell>
@@ -91,6 +99,12 @@ export function UsersTab() {
               </TableRow>
             )}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filteredUsers.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       <Modal isOpen={isAddUserOpen} onClose={() => setIsAddUserOpen(false)} title="Add User">

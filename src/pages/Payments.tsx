@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
 import { StatusPill } from "../components/ui/StatusPill";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Payments() {
+  const [currentPage, setCurrentPage] = useState(1);
   const fmtMoney = (val: number) => "$" + val.toLocaleString();
   const formatDate = (date: string) => new Date(date).toLocaleDateString();
+
+  const pageSize = 5;
+  const paginatedPayments = demo.payments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -18,7 +24,7 @@ export function Payments() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Reference", "Client", "Method", "Amount", "Status", "Date", "Actions"]}>
-          {demo.payments.map(payment => (
+          {paginatedPayments.map(payment => (
             <TableRow key={payment.id}>
               <TableCell><b className="block">{payment.payment_ref}</b></TableCell>
               <TableCell>{payment.customer_name}</TableCell>
@@ -34,6 +40,12 @@ export function Payments() {
             </TableRow>
           ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={demo.payments.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );

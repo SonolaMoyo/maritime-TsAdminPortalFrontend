@@ -3,16 +3,21 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { mockAuditLogs } from "../../data/mockRoles";
 import type { AuditLogEntry } from "../../data/mockRoles";
 import { Search } from "lucide-react";
+import { Pagination } from "../ui/Pagination";
 
 export function AuditLogTab() {
   const [logs] = useState<AuditLogEntry[]>(mockAuditLogs);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredLogs = logs.filter(log => 
     log.actor.toLowerCase().includes(searchTerm.toLowerCase()) || 
     log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
     log.details.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pageSize = 5;
+  const paginatedLogs = filteredLogs.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-6">
@@ -24,15 +29,18 @@ export function AuditLogTab() {
             type="text" 
             placeholder="Search audit log..." 
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-9 pr-4 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-line overflow-hidden">
+      <div className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
         <Table headers={["Date & Time", "Actor", "Action", "Details"]}>
-            {filteredLogs.map((log) => (
+            {paginatedLogs.map((log) => (
               <TableRow key={log.id} className="hover:bg-[#fcfdfa]">
                 <TableCell className="text-[#5b6671]">{log.date}</TableCell>
                 <TableCell className="font-bold text-ink">{log.actor}</TableCell>
@@ -52,6 +60,12 @@ export function AuditLogTab() {
               </TableRow>
             )}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filteredLogs.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

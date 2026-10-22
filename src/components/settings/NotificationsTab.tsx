@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { StatusPill } from "../ui/StatusPill";
 import { Modal } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
 
 export function NotificationsTab() {
   const [isManageRecipientsOpen, setIsManageRecipientsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const events = [
     { name: "New Request", email: true, inApp: true, status: "Active" },
@@ -16,6 +18,9 @@ export function NotificationsTab() {
     { name: "Order Dispatched", email: true, inApp: true, status: "Active" },
     { name: "Low Stock", email: true, inApp: true, status: "Active" },
   ];
+
+  const pageSize = 5;
+  const paginatedEvents = events.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const groups = [
     { name: "Sales Team", count: 3 },
@@ -31,9 +36,9 @@ export function NotificationsTab() {
       <div className="space-y-8">
         <section>
           <h3 className="text-sm font-bold text-ink uppercase tracking-wider mb-4 pb-2 border-b border-line">Notification Events</h3>
-          <div className="border border-line rounded-xl overflow-hidden">
+          <div className="border border-line rounded-xl overflow-hidden shadow-sm">
             <Table headers={["Event", "Email", "In-App", "Status", "Action"]}>
-              {events.map((event, idx) => (
+              {paginatedEvents.map((event, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="font-bold text-ink">{event.name}</TableCell>
                   <TableCell>
@@ -51,6 +56,12 @@ export function NotificationsTab() {
                 </TableRow>
               ))}
             </Table>
+            <Pagination
+              currentPage={currentPage}
+              totalItems={events.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </section>
 

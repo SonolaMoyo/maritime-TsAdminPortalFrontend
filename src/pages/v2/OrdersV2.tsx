@@ -11,6 +11,7 @@ import { useSegment } from "../../context/SegmentContext";
 import { MetricCard } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
 import { Select } from "../../components/ui/Select";
+import { Pagination } from "../../components/ui/Pagination";
 
 const TABS: Array<"All" | OrderStatus> = [
   "All",
@@ -37,6 +38,7 @@ export function OrdersV2() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -257,6 +259,9 @@ export function OrdersV2() {
     return o.status === activeTab;
   });
 
+  const pageSize = 5;
+  const paginatedOrders = finalFiltered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
       {/* Header */}
@@ -297,7 +302,7 @@ export function OrdersV2() {
       {/* Pipeline Stage Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-6 sm:mb-8">
         <div 
-          onClick={() => setActiveTab("All")}
+          onClick={() => { setActiveTab("All"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -308,7 +313,7 @@ export function OrdersV2() {
           />
         </div>
         <div 
-          onClick={() => setActiveTab("Processing")}
+          onClick={() => { setActiveTab("Processing"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -319,7 +324,7 @@ export function OrdersV2() {
           />
         </div>
         <div 
-          onClick={() => setActiveTab("Ready for Dispatch")}
+          onClick={() => { setActiveTab("Ready for Dispatch"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -330,7 +335,7 @@ export function OrdersV2() {
           />
         </div>
         <div 
-          onClick={() => setActiveTab("In Transit")}
+          onClick={() => { setActiveTab("In Transit"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -341,7 +346,7 @@ export function OrdersV2() {
           />
         </div>
         <div 
-          onClick={() => setActiveTab("Delivered")}
+          onClick={() => { setActiveTab("Delivered"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -352,7 +357,7 @@ export function OrdersV2() {
           />
         </div>
         <div 
-          onClick={() => setActiveTab("Completed")}
+          onClick={() => { setActiveTab("Completed"); setCurrentPage(1); }}
           className={`cursor-pointer transition-transform hover:-translate-y-0.5`}
         >
           <MetricCard 
@@ -364,49 +369,54 @@ export function OrdersV2() {
         </div>
       </div>
 
-      {/* Tabs and Search Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-b border-[#e4ece2] pb-4">
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {TABS.map((tab) => {
-            const count = getTabCount(tab);
-            const isActive = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-[800] text-[13px] whitespace-nowrap transition-all border ${
-                  isActive 
-                    ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20" 
-                    : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
-                }`}
-              >
-                <span>{tab}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
-                  isActive ? "bg-white/20 text-white" : "bg-[#e5eee3] text-[#5b6671]"
-                }`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+      {/* Tabs Horizontal Listing */}
+      <div className="flex gap-2 overflow-x-auto pb-3 border-b border-[#e4ece2] mb-4">
+        {TABS.map((tab) => {
+          const count = getTabCount(tab);
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+              }}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-[800] text-[13px] whitespace-nowrap transition-all border ${
+                isActive 
+                  ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20" 
+                  : "bg-white text-[#5b6671] border-line hover:border-brand-green/40 hover:bg-[#f8faf7] hover:text-ink shadow-xs cursor-pointer"
+              }`}
+            >
+              <span>{tab}</span>
+              <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                isActive ? "bg-white/20 text-white" : "bg-[#e5eee3] text-[#5b6671]"
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search and Filters Bar - placed below tabs, above table */}
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="relative flex-1 max-w-[420px]">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a949d]" />
+          <input 
+            type="text" 
+            placeholder="Search by ID, client..." 
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-white text-[13px] font-medium text-ink w-full focus:outline-none focus:border-brand-green transition-colors shadow-xs"
+          />
         </div>
-        
-        <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a949d]" />
-            <input 
-              type="text" 
-              placeholder="Search by ID, client..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[13px] font-medium text-ink w-full sm:w-[260px] focus:outline-none focus:border-brand-green transition-colors"
-            />
-          </div>
-          <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[13px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer flex-shrink-0">
-            <Filter className="w-4 h-4" />
-            <span className="hidden xs:inline">Filters</span>
-          </button>
-        </div>
+        <button className="h-[40px] px-4 rounded-full border border-line bg-white text-[#5b6671] font-[800] text-[13px] hover:bg-[#fcfdfa] transition-all flex items-center gap-2 cursor-pointer flex-shrink-0 shadow-xs">
+          <Filter className="w-4 h-4" />
+          <span className="hidden xs:inline">Filters</span>
+        </button>
       </div>
 
       {/* Orders Table */}
@@ -416,81 +426,89 @@ export function OrdersV2() {
             <Clock className="w-5 h-5 animate-spin text-brand-green" /> Loading operational orders...
           </div>
         ) : (
-          <Table headers={["Order ID", "Customer & Segment", "Items & Value", "Fulfillment Stage", "Logistics Status", "Date", "Action"]}>
-            {finalFiltered.map((order) => {
-              const totalItems = order.items.reduce((sum, i) => sum + i.quantity, 0);
-              const totalAllocated = order.items.reduce((sum, i) => sum + i.allocatedQuantity, 0);
-              const isAllocated = totalAllocated >= totalItems;
+          <>
+            <Table headers={["Order ID", "Customer & Segment", "Items & Value", "Fulfillment Stage", "Logistics Status", "Date", "Action"]}>
+              {paginatedOrders.map((order) => {
+                const totalItems = order.items.reduce((sum, i) => sum + i.quantity, 0);
+                const totalAllocated = order.items.reduce((sum, i) => sum + i.allocatedQuantity, 0);
+                const isAllocated = totalAllocated >= totalItems;
 
-              return (
-                <TableRow key={order.id} className="cursor-pointer hover:bg-[#fcfdfa] transition-colors" onClick={() => navigate(`/orders/${order.id}`)}>
+                return (
+                  <TableRow key={order.id} className="cursor-pointer hover:bg-[#fcfdfa] transition-colors" onClick={() => navigate(`/orders/${order.id}`)}>
+                    <TableCell>
+                      <div className="font-bold text-ink text-[14px]">{order.orderNumber}</div>
+                      <div className="text-[11px] font-bold text-[#8a949d]">Prepaid</div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="font-bold text-ink text-[14px]">{order.customerName}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[12px] text-[#5b6671]">{order.companyName || "Individual Client"}</span>
+                        <span className="text-[11px] font-bold text-brand-green bg-[#eff5ed] px-2 py-0.5 rounded-full">{order.segment}</span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="font-black text-ink text-[14px]">₦{order.totalAmount.toLocaleString()}</div>
+                      <div className="text-[12px] text-[#5b6671] font-medium">
+                        {totalItems} {totalItems === 1 ? "unit" : "units"} ({order.items.length} {order.items.length === 1 ? "line item" : "line items"})
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <StatusPill status={order.status} />
+                        {order.status === "Processing" && (
+                          <span className={`text-[11px] font-bold ${isAllocated ? "text-brand-green" : "text-[#996600]"}`}>
+                            {isAllocated ? "✓ Fully Allocated" : `${totalAllocated}/${totalItems} allocated`}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+                        <Truck className="w-3.5 h-3.5 text-[#5b6671]" />
+                        <span>{order.delivery.status}</span>
+                      </div>
+                      <div className="text-[11px] text-[#8a949d] truncate max-w-[160px]">{order.delivery.location}</div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="text-[13px] font-medium text-ink">
+                        {new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order.id}`); }}
+                        className="inline-flex items-center gap-1 text-[13px] font-[800] text-brand-green hover:text-brand-green2 hover:underline cursor-pointer"
+                      >
+                        Manage <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+              {finalFiltered.length === 0 && (
+                <TableRow>
                   <TableCell>
-                    <div className="font-bold text-ink text-[14px]">{order.orderNumber}</div>
-                    <div className="text-[11px] font-bold text-[#8a949d]">Prepaid</div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-bold text-ink text-[14px]">{order.customerName}</div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[12px] text-[#5b6671]">{order.companyName || "Individual Client"}</span>
-                      <span className="text-[11px] font-bold text-brand-green bg-[#eff5ed] px-2 py-0.5 rounded-full">{order.segment}</span>
+                    <div className="p-12 text-center text-[#8a949d] font-semibold w-full block">
+                      No orders found in "{activeTab}".
                     </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="font-black text-ink text-[14px]">₦{order.totalAmount.toLocaleString()}</div>
-                    <div className="text-[12px] text-[#5b6671] font-medium">
-                      {totalItems} {totalItems === 1 ? "unit" : "units"} ({order.items.length} {order.items.length === 1 ? "line item" : "line items"})
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <StatusPill status={order.status} />
-                      {order.status === "Processing" && (
-                        <span className={`text-[11px] font-bold ${isAllocated ? "text-brand-green" : "text-[#996600]"}`}>
-                          {isAllocated ? "✓ Fully Allocated" : `${totalAllocated}/${totalItems} allocated`}
-                        </span>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="text-[13px] font-bold text-ink flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-[#5b6671]" />
-                      <span>{order.delivery.status}</span>
-                    </div>
-                    <div className="text-[11px] text-[#8a949d] truncate max-w-[160px]">{order.delivery.location}</div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="text-[13px] font-medium text-ink">
-                      {new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order.id}`); }}
-                      className="inline-flex items-center gap-1 text-[13px] font-[800] text-brand-green hover:text-brand-green2 hover:underline cursor-pointer"
-                    >
-                      Manage <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
                   </TableCell>
                 </TableRow>
-              );
-            })}
-
-            {finalFiltered.length === 0 && (
-              <TableRow>
-                <TableCell>
-                  <div className="p-12 text-center text-[#8a949d] font-semibold w-full block">
-                    No orders found in "{activeTab}".
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </Table>
+              )}
+            </Table>
+            <Pagination
+              currentPage={currentPage}
+              totalItems={finalFiltered.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </div>
 

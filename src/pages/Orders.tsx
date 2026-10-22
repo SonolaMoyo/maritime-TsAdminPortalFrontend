@@ -1,11 +1,22 @@
+import { useState, useMemo } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
 import { StatusPill } from "../components/ui/StatusPill";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Orders() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
   const fmtMoney = (val: number) => "$" + val.toLocaleString();
   const formatDate = (date: string) => new Date(date).toLocaleDateString();
+
+  const totalPages = Math.ceil(demo.orders.length / pageSize) || 1;
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return demo.orders.slice(start, start + pageSize);
+  }, [currentPage, pageSize]);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -21,7 +32,7 @@ export function Orders() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Order", "Client", "Products", "Status", "Payment", "Delivery", "Total", "Actions"]}>
-          {demo.orders.map(order => (
+          {paginatedOrders.map(order => (
             <TableRow key={order.id}>
               <TableCell>
                 <b className="block">{order.order_number}</b>
@@ -46,6 +57,13 @@ export function Orders() {
             </TableRow>
           ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={demo.orders.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );

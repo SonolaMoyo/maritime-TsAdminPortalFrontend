@@ -4,6 +4,7 @@ import type { Warehouse, ProductInventory } from "../../data/mockInventory";
 import { MapPin, Plus, Trash2 } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Table, TableRow, TableCell } from "../ui/Table";
+import { Pagination } from "../ui/Pagination";
 
 export function WarehousesTab() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -14,6 +15,7 @@ export function WarehousesTab() {
 
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
   const [warehouseInventory, setWarehouseInventory] = useState<ProductInventory[]>([]);
+  const [whPage, setWhPage] = useState(1);
 
   const loadData = async () => {
     setLoading(true);
@@ -43,9 +45,13 @@ export function WarehousesTab() {
 
   const handleViewInventory = async (wh: Warehouse) => {
     setSelectedWarehouse(wh);
+    setWhPage(1);
     const allInv = await inventoryService.getInventory();
     setWarehouseInventory(allInv.filter(i => i.warehouseId === wh.id));
   };
+
+  const whPageSize = 5;
+  const paginatedWhInv = warehouseInventory.slice((whPage - 1) * whPageSize, whPage * whPageSize);
 
   if (loading) return <div className="p-12 text-center text-[#8a949d] font-bold border border-line rounded-2xl">Loading Warehouses...</div>;
 
@@ -120,7 +126,7 @@ export function WarehousesTab() {
       <Modal isOpen={!!selectedWarehouse} onClose={() => setSelectedWarehouse(null)} title={`${selectedWarehouse?.name} Inventory`}>
         <div className="space-y-4">
           <Table headers={["Product", "Total Stock", "Status"]}>
-            {warehouseInventory.map((item) => (
+            {paginatedWhInv.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   <div className="font-bold text-ink text-[14px]">{item.productName}</div>
@@ -145,6 +151,12 @@ export function WarehousesTab() {
               </TableRow>
             )}
           </Table>
+          <Pagination
+            currentPage={whPage}
+            totalItems={warehouseInventory.length}
+            pageSize={whPageSize}
+            onPageChange={setWhPage}
+          />
           
           <div className="pt-4 flex justify-end">
             <button onClick={() => setSelectedWarehouse(null)} className="px-4 py-2 rounded-full bg-brand-green text-white text-sm font-bold hover:bg-brand-green2">Close</button>

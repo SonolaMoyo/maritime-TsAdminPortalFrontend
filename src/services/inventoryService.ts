@@ -118,20 +118,49 @@ class InventoryService {
     }
   }
 
-  async receiveStock(inventoryId: string, quantity: number, reference?: string): Promise<ProductInventory> {
+  async receiveStock(
+    inventoryId: string | undefined,
+    quantity: number,
+    reference?: string,
+    description?: string,
+    productId?: string,
+    warehouseId?: string
+  ): Promise<ProductInventory> {
     try {
-      const response = await apiFetch<ProductInventory>(`/inventory/${inventoryId}/receive`, {
+      const endpoint = inventoryId ? `/inventory/${inventoryId}/receive` : '/inventory/receive';
+      const response = await apiFetch<ProductInventory>(endpoint, {
         method: 'POST',
-        body: JSON.stringify({ quantity, reference }),
+        body: JSON.stringify({ quantity, reference, description, productId, warehouseId }),
       });
       return response.data;
     } catch (err) {
       console.warn('[InventoryService] API error receiving stock, using local fallback:', err);
       await delay(200);
-      const index = this.fallbackInventory.findIndex(i => i.id === inventoryId);
-      if (index === -1) throw new Error("Inventory record not found");
+      let inv = this.fallbackInventory.find(i => 
+        (inventoryId && i.id === inventoryId) || 
+        (productId && warehouseId && i.productId === productId && i.warehouseId === warehouseId)
+      );
 
-      const inv = this.fallbackInventory[index];
+      if (!inv && productId && warehouseId) {
+        inv = {
+          id: `inv-${Date.now()}`,
+          productId,
+          productName: "Product",
+          segment: "Solar Tech",
+          warehouseId,
+          quantity: 0,
+          allocatedQuantity: 0,
+          availableQuantity: 0,
+          reorderThreshold: 10,
+          status: "Out of Stock",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        this.fallbackInventory.unshift(inv);
+      }
+
+      if (!inv) throw new Error("Inventory record not found");
+
       const newQuantity = inv.quantity + quantity;
       const newAvailable = inv.availableQuantity + quantity;
       
@@ -140,15 +169,35 @@ class InventoryService {
       else if (newAvailable <= inv.reorderThreshold) newStatus = "Low Stock";
       else newStatus = "Healthy";
 
-      this.fallbackInventory[index] = {
-        ...inv,
-        quantity: newQuantity,
-        availableQuantity: newAvailable,
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      };
+      inv.quantity = newQuantity;
+      inv.availableQuantity = newAvailable;
+      inv.status = newStatus;
+      inv.updatedAt = new Date().toISOString();
 
-      return this.fallbackInventory[index];
+      const refNo = reference && reference.trim().length > 0 ? reference : `REC-${Math.floor(100000 + Math.random() * 900000)}`;
+      const newReceipt: InventoryReceipt = {
+        id: `rec-${Date.now()}`,
+        referenceNumber: refNo,
+        receiptNumber: refNo,
+        warehouseId: inv.warehouseId,
+        productName: inv.productName,
+        quantity: quantity,
+        expectedDate: new Date().toISOString().split('T')[0],
+        date: new Date().toISOString().split('T')[0],
+        status: "Received",
+        description: description || "",
+        createdAt: new Date().toISOString()
+      };
+      this.fallbackReceipts.unshift(newReceipt);
+
+      await this.recordActivity(
+        "Stock Received",
+        `Received +${quantity} units of ${inv.productName}${refNo ? ` (Ref: ${refNo})` : ''}${description ? ` - ${description}` : ''}`,
+        inv.warehouseId,
+        quantity
+      );
+
+      return inv;
     }
   }
 

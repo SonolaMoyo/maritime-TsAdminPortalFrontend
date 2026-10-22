@@ -5,10 +5,12 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Select } from "../ui/Select";
+import { Pagination } from "../ui/Pagination";
 
 export function CategoriesTab() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", segment: "Solar Tech" as any, status: "Active" as any });
@@ -42,33 +44,41 @@ export function CategoriesTab() {
       {loading ? (
         <div className="p-12 text-center text-[#8a949d] font-semibold">Loading categories...</div>
       ) : (
-        <Table headers={["Category", "Segment", "Products", "Status", "Action"]}>
-          {categories.map((cat) => (
-            <TableRow key={cat.id} className="cursor-pointer hover:bg-[#fcfdfa]">
-              <TableCell><div className="font-bold text-ink">{cat.name}</div></TableCell>
-              <TableCell>
-                <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{cat.segment}</span>
-              </TableCell>
-              <TableCell><div className="font-black text-ink">{cat.productCount}</div></TableCell>
-              <TableCell>
-                <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${cat.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
-                  }`}>
-                  {cat.status}
-                </div>
-              </TableCell>
-              <TableCell>
-                <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
-                  Edit
-                </button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {categories.length === 0 && (
-            <TableRow>
-              <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No categories found.</div></TableCell>
-            </TableRow>
-          )}
-        </Table>
+        <>
+          <Table headers={["Category", "Segment", "Products", "Status", "Action"]}>
+            {categories.slice((currentPage - 1) * 5, currentPage * 5).map((cat) => (
+              <TableRow key={cat.id} className="cursor-pointer hover:bg-[#fcfdfa]">
+                <TableCell><div className="font-bold text-ink">{cat.name}</div></TableCell>
+                <TableCell>
+                  <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{cat.segment}</span>
+                </TableCell>
+                <TableCell><div className="font-black text-ink">{cat.productCount}</div></TableCell>
+                <TableCell>
+                  <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${cat.status === 'Active' ? 'bg-[#f4fce3] text-[#65a30d]' : 'bg-[#fef2f2] text-[#ef4444]'
+                    }`}>
+                    {cat.status}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
+                    Edit
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {categories.length === 0 && (
+              <TableRow>
+                <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No categories found.</div></TableCell>
+              </TableRow>
+            )}
+          </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={categories.length}
+            pageSize={5}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add Category">

@@ -27,19 +27,25 @@ export interface Warehouse {
 
 export interface InventoryReceipt {
   id: string;
-  referenceNumber: string;
-  supplierId: string;
+  referenceNumber?: string;
+  receiptNumber?: string;
+  supplierId?: string;
+  supplierName?: string;
   warehouseId: string;
-  expectedDate: string;
-  status: "Expected" | "In Transit" | "Received" | "Cancelled";
-  items: {
+  productName?: string;
+  quantity?: number;
+  expectedDate?: string;
+  date?: string;
+  status: "Expected" | "In Transit" | "Received" | "Cancelled" | "Delayed" | string;
+  description?: string;
+  items?: {
     productId: string;
     productName: string;
     expectedQuantity: number;
     receivedQuantity: number;
     unitCost: number;
   }[];
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface InventoryTransfer {

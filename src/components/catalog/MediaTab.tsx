@@ -4,10 +4,13 @@ import type { MediaAsset } from "../../data/mockCatalog";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus, Image as ImageIcon, FileText } from "lucide-react";
 import { Modal } from "../ui/Modal";
+import { Pagination } from "../ui/Pagination";
 
 export function MediaTab() {
   const [media, setMedia] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mediaFilter, setMediaFilter] = useState<"All" | "Images" | "PDFs">("All");
+  const [currentPage, setCurrentPage] = useState(1);
   
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [uploadForm, setUploadForm] = useState({ name: "", type: "image/jpeg", size: "2.1 MB" });
@@ -30,13 +33,37 @@ export function MediaTab() {
     loadData();
   };
 
+  const filteredMedia = media.filter(m => {
+    if (mediaFilter === "Images") return m.type.includes("image");
+    if (mediaFilter === "PDFs") return m.type.includes("pdf");
+    return true;
+  });
+
+  const pageSize = 5;
+  const paginatedMedia = filteredMedia.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-sm">
       <div className="p-4 border-b border-line flex justify-between items-center bg-[#fcfdfa]">
         <div className="flex gap-4 text-[14px] font-bold text-[#8a949d]">
-          <button className="text-ink">All Media</button>
-          <button className="hover:text-ink transition-colors">Images</button>
-          <button className="hover:text-ink transition-colors">PDFs</button>
+          <button 
+            onClick={() => { setMediaFilter("All"); setCurrentPage(1); }} 
+            className={mediaFilter === "All" ? "text-ink" : "hover:text-ink transition-colors"}
+          >
+            All Media
+          </button>
+          <button 
+            onClick={() => { setMediaFilter("Images"); setCurrentPage(1); }} 
+            className={mediaFilter === "Images" ? "text-ink" : "hover:text-ink transition-colors"}
+          >
+            Images
+          </button>
+          <button 
+            onClick={() => { setMediaFilter("PDFs"); setCurrentPage(1); }} 
+            className={mediaFilter === "PDFs" ? "text-ink" : "hover:text-ink transition-colors"}
+          >
+            PDFs
+          </button>
         </div>
         <button onClick={() => setIsUploadOpen(true)} className="px-4 py-2 bg-brand-green text-white text-[13px] font-bold rounded-lg flex items-center gap-2 hover:bg-brand-green2">
           <Plus className="w-4 h-4" /> Upload Media
@@ -46,47 +73,55 @@ export function MediaTab() {
       {loading ? (
         <div className="p-12 text-center text-[#8a949d] font-semibold">Loading media library...</div>
       ) : (
-        <Table headers={["Preview", "File Name", "Size", "Uploaded", "Used By", "Action"]}>
-          {media.map((asset) => (
-            <TableRow key={asset.id} className="cursor-pointer hover:bg-[#fcfdfa]">
-              <TableCell>
-                <div className="w-12 h-12 rounded-lg bg-line overflow-hidden flex items-center justify-center">
-                  {asset.type.includes('image') ? (
-                    <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <FileText className="w-6 h-6 text-[#8a949d]" />
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="font-bold text-ink text-[14px]">{asset.name}</div>
-                <div className="text-[12px] text-[#8a949d] uppercase">{asset.type.split('/')[1]}</div>
-              </TableCell>
-              <TableCell><div className="font-medium text-ink text-[13px]">{asset.size}</div></TableCell>
-              <TableCell>
-                <div className="text-[13px] text-[#5b6671]">
-                  {new Date(asset.uploadedAt).toLocaleDateString()}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="font-bold text-ink">{asset.usedBy} places</div>
-              </TableCell>
-              <TableCell>
-                <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer mr-3">
-                  View
-                </button>
-                <button className="text-[13px] font-[800] text-red-500 hover:underline cursor-pointer">
-                  Delete
-                </button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {media.length === 0 && (
-            <TableRow>
-              <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No media found.</div></TableCell>
-            </TableRow>
-          )}
-        </Table>
+        <>
+          <Table headers={["Preview", "File Name", "Size", "Uploaded", "Used By", "Action"]}>
+            {paginatedMedia.map((asset) => (
+              <TableRow key={asset.id} className="cursor-pointer hover:bg-[#fcfdfa]">
+                <TableCell>
+                  <div className="w-12 h-12 rounded-lg bg-line overflow-hidden flex items-center justify-center">
+                    {asset.type.includes('image') ? (
+                      <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <FileText className="w-6 h-6 text-[#8a949d]" />
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-bold text-ink text-[14px]">{asset.name}</div>
+                  <div className="text-[12px] text-[#8a949d] uppercase">{asset.type.split('/')[1]}</div>
+                </TableCell>
+                <TableCell><div className="font-medium text-ink text-[13px]">{asset.size}</div></TableCell>
+                <TableCell>
+                  <div className="text-[13px] text-[#5b6671]">
+                    {new Date(asset.uploadedAt).toLocaleDateString()}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-bold text-ink">{asset.usedBy} places</div>
+                </TableCell>
+                <TableCell>
+                  <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer mr-3">
+                    View
+                  </button>
+                  <button className="text-[13px] font-[800] text-red-500 hover:underline cursor-pointer">
+                    Delete
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {filteredMedia.length === 0 && (
+              <TableRow>
+                <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No media found.</div></TableCell>
+              </TableRow>
+            )}
+          </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredMedia.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <Modal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} title="Upload Media">

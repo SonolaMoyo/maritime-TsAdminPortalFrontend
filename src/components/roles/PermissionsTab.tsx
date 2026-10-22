@@ -3,16 +3,21 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { mockPermissions } from "../../data/mockRoles";
 import type { Permission } from "../../data/mockRoles";
 import { Search } from "lucide-react";
+import { Pagination } from "../ui/Pagination";
 
 export function PermissionsTab() {
   const [permissions] = useState<Permission[]>(mockPermissions);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredPermissions = permissions.filter(p => 
     p.key.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.module.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const pageSize = 5;
+  const paginatedPermissions = filteredPermissions.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="space-y-6">
@@ -24,15 +29,18 @@ export function PermissionsTab() {
             type="text" 
             placeholder="Search permissions..." 
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-9 pr-4 py-2 bg-white border border-line rounded-xl text-sm focus:outline-none focus:border-brand-green"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-line overflow-hidden">
+      <div className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
         <Table headers={["Permission", "Module", "Action", "Description"]}>
-            {filteredPermissions.map((permission) => (
+            {paginatedPermissions.map((permission) => (
               <TableRow key={permission.id} className="hover:bg-[#fcfdfa]">
                 <TableCell>
                   <code className="text-xs bg-[#f4f7f4] text-[#005642] px-2 py-1 rounded font-mono font-bold">
@@ -52,6 +60,12 @@ export function PermissionsTab() {
               </TableRow>
             )}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filteredPermissions.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

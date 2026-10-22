@@ -3,10 +3,12 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { StatusPill } from "../ui/StatusPill";
 import { Modal } from "../ui/Modal";
 import { Select } from "../ui/Select";
+import { Pagination } from "../ui/Pagination";
 
 export function SegmentsTab() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedSegment, setSelectedSegment] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const segments = [
     { name: "Solar Tech", code: "SOL", status: "Active", products: 42, featured: 8 },
@@ -14,6 +16,9 @@ export function SegmentsTab() {
     { name: "EV", code: "EV", status: "Active", products: 25, featured: 5 },
     { name: "Electronics", code: "ELE", status: "Active", products: 61, featured: 12 },
   ];
+
+  const pageSize = 5;
+  const paginatedSegments = segments.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleEdit = (segment: any) => {
     setSelectedSegment(segment);
@@ -30,9 +35,9 @@ export function SegmentsTab() {
           Note: Content for these segments (like banners or featured products) is managed in the Catalog.
         </p>
 
-        <div className="bg-white rounded-xl border border-line overflow-hidden">
+        <div className="bg-white rounded-xl border border-line overflow-hidden shadow-sm">
           <Table headers={["Segment", "Code", "Products", "Featured", "Status", "Action"]}>
-            {segments.map((segment, idx) => (
+            {paginatedSegments.map((segment, idx) => (
               <TableRow key={idx}>
                 <TableCell className="font-bold text-ink">{segment.name}</TableCell>
                 <TableCell>
@@ -56,6 +61,12 @@ export function SegmentsTab() {
               </TableRow>
             ))}
           </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={segments.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 

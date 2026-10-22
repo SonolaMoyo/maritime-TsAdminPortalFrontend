@@ -5,11 +5,13 @@ import { Table, TableRow, TableCell } from "../ui/Table";
 import { Plus, GripVertical } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Select } from "../ui/Select";
+import { Pagination } from "../ui/Pagination";
 
 export function FeaturedTab() {
   const [featuredProducts, setFeaturedProducts] = useState<CatalogProduct[]>([]);
   const [allProducts, setAllProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -58,43 +60,51 @@ export function FeaturedTab() {
       {loading ? (
         <div className="p-12 text-center text-[#8a949d] font-semibold">Loading featured products...</div>
       ) : (
-        <Table headers={["Order", "Product", "Segment", "Status", "Action"]}>
-          {featuredProducts.map((prod, index) => (
-            <TableRow key={prod.id} className="cursor-grab active:cursor-grabbing hover:bg-[#fcfdfa]">
-              <TableCell>
-                <div className="flex items-center gap-3 text-[#8a949d] font-black">
-                  <GripVertical className="w-4 h-4 text-line" />
-                  {index + 1}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="font-bold text-ink text-[14px]">{prod.name}</div>
-              </TableCell>
-              <TableCell>
-                <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{prod.segment}</span>
-              </TableCell>
-              <TableCell>
-                <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
-                  prod.status === 'Published' ? 'bg-[#f4fce3] text-[#65a30d]' :
-                  prod.status === 'Draft' ? 'bg-[#f8fafc] text-[#64748b] border border-[#cbd5e1]' :
-                  'bg-[#fef2f2] text-[#ef4444]'
-                }`}>
-                  {prod.status}
-                </div>
-              </TableCell>
-              <TableCell>
-                <button onClick={() => handleRemove(prod.id)} className="text-[13px] font-[800] text-red-500 hover:underline cursor-pointer">
-                  Remove
-                </button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {featuredProducts.length === 0 && (
-            <TableRow>
-              <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No featured products.</div></TableCell>
-            </TableRow>
-          )}
-        </Table>
+        <>
+          <Table headers={["Order", "Product", "Segment", "Status", "Action"]}>
+            {featuredProducts.slice((currentPage - 1) * 5, currentPage * 5).map((prod, index) => (
+              <TableRow key={prod.id} className="cursor-grab active:cursor-grabbing hover:bg-[#fcfdfa]">
+                <TableCell>
+                  <div className="flex items-center gap-3 text-[#8a949d] font-black">
+                    <GripVertical className="w-4 h-4 text-line" />
+                    {(currentPage - 1) * 5 + index + 1}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="font-bold text-ink text-[14px]">{prod.name}</div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{prod.segment}</span>
+                </TableCell>
+                <TableCell>
+                  <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
+                    prod.status === 'Published' ? 'bg-[#f4fce3] text-[#65a30d]' :
+                    prod.status === 'Draft' ? 'bg-[#f8fafc] text-[#64748b] border border-[#cbd5e1]' :
+                    'bg-[#fef2f2] text-[#ef4444]'
+                  }`}>
+                    {prod.status}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <button onClick={() => handleRemove(prod.id)} className="text-[13px] font-[800] text-red-500 hover:underline cursor-pointer">
+                    Remove
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {featuredProducts.length === 0 && (
+              <TableRow>
+                <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No featured products.</div></TableCell>
+              </TableRow>
+            )}
+          </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={featuredProducts.length}
+            pageSize={5}
+            onPageChange={setCurrentPage}
+          />
+        </>
       )}
 
       <Modal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="Add Featured Product">

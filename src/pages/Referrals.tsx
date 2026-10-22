@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Referrals() {
+  const [currentPage, setCurrentPage] = useState(1);
   const fmtMoney = (val: number) => "$" + val.toLocaleString();
+
+  const pageSize = 5;
+  const paginatedReferrals = demo.referrals.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -16,7 +22,7 @@ export function Referrals() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Partner", "Type", "Leads", "Converted", "Commission Rate", "Total Revenue"]}>
-          {demo.referrals.map(ref => (
+          {paginatedReferrals.map(ref => (
             <TableRow key={ref.id}>
               <TableCell><b className="block">{ref.name}</b></TableCell>
               <TableCell>{ref.referral_type}</TableCell>
@@ -27,6 +33,12 @@ export function Referrals() {
             </TableRow>
           ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={demo.referrals.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );

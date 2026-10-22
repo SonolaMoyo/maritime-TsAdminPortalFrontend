@@ -5,13 +5,18 @@ import { Modal } from "../ui/Modal";
 import { mockRoles } from "../../data/mockRoles";
 import type { Role } from "../../data/mockRoles";
 import { Plus } from "lucide-react";
+import { Pagination } from "../ui/Pagination";
 
 export function RolesTab() {
   const [roles, setRoles] = useState<Role[]>(mockRoles);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddRoleOpen, setIsAddRoleOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   
   const [addForm, setAddForm] = useState({ name: "", description: "" });
+
+  const pageSize = 5;
+  const paginatedRoles = roles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleAddRole = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +46,9 @@ export function RolesTab() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-line overflow-hidden">
+      <div className="bg-white rounded-2xl border border-line overflow-hidden shadow-sm">
         <Table headers={["Role", "Description", "Users", "Permissions", "Status", "Action"]}>
-            {roles.map((role) => (
+            {paginatedRoles.map((role) => (
               <TableRow key={role.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => setSelectedRole(role)}>
                 <TableCell className="font-bold text-ink">{role.name}</TableCell>
                 <TableCell className="text-[#5b6671] max-w-xs truncate">{role.description}</TableCell>
@@ -58,6 +63,12 @@ export function RolesTab() {
               </TableRow>
             ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={roles.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       <Modal isOpen={isAddRoleOpen} onClose={() => setIsAddRoleOpen(false)} title="Create Role">

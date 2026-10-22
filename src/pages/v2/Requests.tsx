@@ -9,6 +9,7 @@ import { useSegment } from "../../context/SegmentContext";
 import { MetricCard } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
 import { Select } from "../../components/ui/Select";
+import { Pagination } from "../../components/ui/Pagination";
 
 export function Requests() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export function Requests() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Pending");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -88,6 +90,9 @@ export function Requests() {
     return true;
   });
 
+  const pageSize = 5;
+  const paginatedRequests = finalFiltered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
@@ -118,7 +123,10 @@ export function Requests() {
           {["All", "Pending", "In Progress", "Completed"].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+              }}
               className={`px-4 py-2 rounded-xl font-[800] text-[13px] sm:text-[14px] whitespace-nowrap transition-all border ${
                 activeTab === tab 
                   ? "bg-brand-green text-white border-brand-green shadow-sm ring-2 ring-brand-green/20" 
@@ -137,7 +145,10 @@ export function Requests() {
               type="text" 
               placeholder="Search requests..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="h-[40px] pl-10 pr-4 rounded-full border border-line bg-[#fcfdfa] text-[13px] sm:text-[14px] font-medium text-ink w-full sm:w-[240px] focus:outline-none focus:border-brand-green transition-colors"
             />
           </div>
@@ -153,53 +164,61 @@ export function Requests() {
         {loading ? (
           <div className="p-12 text-center text-[#8a949d] font-semibold">Loading requests...</div>
         ) : (
-          <Table headers={["Request ID", "Customer", "Product", "Segment", "Quantity", "Date", "Owner", "Status", "Action"]}>
-            {finalFiltered.map((req) => (
-              <TableRow key={req.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/requests/${req.id}`)}>
-                <TableCell>
-                  <div className="font-bold text-ink">{req.requestNumber}</div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-bold text-ink text-[14px]">{req.customerName}</div>
-                  <div className="text-[13px] text-[#5b6671]">{req.companyName}</div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-semibold text-ink text-[14px] max-w-[200px] truncate">{req.product}</div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{req.segment}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="font-semibold text-ink">{req.quantity} units</div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-[14px] font-medium text-ink">
-                    {new Date(req.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-[14px] font-semibold text-[#5b6671]">
-                    {req.owner || <span className="text-[#a11f1f] text-[12px] uppercase tracking-wider">Unassigned</span>}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <StatusPill status={req.status} />
-                </TableCell>
-                <TableCell>
-                  <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
-                    View
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {finalFiltered.length === 0 && (
-              <TableRow>
-                <TableCell>
-                  <div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No requests found.</div>
-                </TableCell>
-              </TableRow>
-            )}
-          </Table>
+          <>
+            <Table headers={["Request ID", "Customer", "Product", "Segment", "Quantity", "Date", "Owner", "Status", "Action"]}>
+              {paginatedRequests.map((req) => (
+                <TableRow key={req.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/requests/${req.id}`)}>
+                  <TableCell>
+                    <div className="font-bold text-ink">{req.requestNumber}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold text-ink text-[14px]">{req.customerName}</div>
+                    <div className="text-[13px] text-[#5b6671]">{req.companyName}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold text-ink text-[14px] max-w-[200px] truncate">{req.product}</div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{req.segment}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold text-ink">{req.quantity} units</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-[14px] font-medium text-ink">
+                      {new Date(req.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-[14px] font-semibold text-[#5b6671]">
+                      {req.owner || <span className="text-[#a11f1f] text-[12px] uppercase tracking-wider">Unassigned</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <StatusPill status={req.status} />
+                  </TableCell>
+                  <TableCell>
+                    <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
+                      View
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {finalFiltered.length === 0 && (
+                <TableRow>
+                  <TableCell>
+                    <div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No requests found.</div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </Table>
+            <Pagination
+              currentPage={currentPage}
+              totalItems={finalFiltered.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </div>
 

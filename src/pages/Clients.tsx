@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Panel } from "../components/ui/Card";
 import { Table, TableRow, TableCell } from "../components/ui/Table";
+import { Pagination } from "../components/ui/Pagination";
 import { demo } from "../data/mockData";
 
 export function Clients() {
+  const [currentPage, setCurrentPage] = useState(1);
   const fmtMoney = (val: number) => "$" + val.toLocaleString();
+
+  const pageSize = 5;
+  const paginatedClients = demo.clients.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -16,7 +22,7 @@ export function Clients() {
 
       <Panel className="p-0 overflow-hidden">
         <Table headers={["Client", "Contact", "Location", "Type", "Source", "Assigned To", "Total Purchase"]}>
-          {demo.clients.map(client => (
+          {paginatedClients.map(client => (
             <TableRow key={client.id}>
               <TableCell><b className="block">{client.name}</b></TableCell>
               <TableCell>
@@ -31,6 +37,12 @@ export function Clients() {
             </TableRow>
           ))}
         </Table>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={demo.clients.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </Panel>
     </div>
   );
