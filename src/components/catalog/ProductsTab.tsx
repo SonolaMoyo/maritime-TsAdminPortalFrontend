@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { catalogService } from "../../services/catalogService";
-import type { CatalogProduct, ProductCategory, Brand } from "../../data/mockCatalog";
+import type { CatalogProduct } from "../../data/mockCatalog";
 import { useSegment } from "../../context/SegmentContext";
 import { Table, TableRow, TableCell } from "../ui/Table";
 import { Search, Plus } from "lucide-react";
@@ -11,25 +11,18 @@ export function ProductsTab() {
   const { segment } = useSegment();
   const navigate = useNavigate();
   const [products, setProducts] = useState<(CatalogProduct & { stock: number })[]>([]);
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const loadData = async () => {
+    setLoading(true);
+    const p = await catalogService.getProducts();
+    setProducts(p);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      const [p, c, b] = await Promise.all([
-        catalogService.getProducts(),
-        catalogService.getCategories(),
-        catalogService.getBrands()
-      ]);
-      setProducts(p);
-      setCategories(c);
-      setBrands(b);
-      setLoading(false);
-    };
     loadData();
   }, []);
 
@@ -40,6 +33,7 @@ export function ProductsTab() {
   });
 
   const pageSize = 5;
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
@@ -70,38 +64,32 @@ export function ProductsTab() {
         <div className="p-12 text-center text-[#8a949d] font-semibold">Loading catalog...</div>
       ) : (
         <>
-          <Table headers={["Product", "Segment", "Category", "Brand", "Stock", "Status", "Action"]}>
-            {paginatedProducts.map((prod) => {
-              const cat = categories.find(c => c.id === prod.categoryId);
-              const brand = brands.find(b => b.id === prod.brandId);
-              return (
-                <TableRow key={prod.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/catalog/products/${prod.id}`)}>
-                  <TableCell>
-                    <div className="font-bold text-ink text-[14px]">{prod.name}</div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2 py-1 rounded-md">{prod.segment}</span>
-                  </TableCell>
-                  <TableCell><div className="font-medium text-ink">{cat?.name || '-'}</div></TableCell>
-                  <TableCell><div className="font-medium text-ink">{brand?.name || '-'}</div></TableCell>
-                  <TableCell><div className="font-black text-ink">{prod.stock}</div></TableCell>
-                  <TableCell>
-                    <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
-                      prod.status === 'Published' ? 'bg-[#f4fce3] text-[#65a30d]' :
-                      prod.status === 'Draft' ? 'bg-[#f8fafc] text-[#64748b] border border-[#cbd5e1]' :
-                      'bg-[#fef2f2] text-[#ef4444]'
-                    }`}>
-                      {prod.status}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
-                      View
-                    </button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+          <Table headers={["Product", "Segment", "Stock", "Status", "Action"]}>
+            {paginatedProducts.map((prod) => (
+              <TableRow key={prod.id} className="cursor-pointer hover:bg-[#fcfdfa]" onClick={() => navigate(`/catalog/products/${prod.id}`)}>
+                <TableCell>
+                  <div className="font-bold text-ink text-[14px]">{prod.name}</div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-[13px] font-bold text-[#5b6671] bg-[#f4f7f5] px-2.5 py-1 rounded-md">{prod.segment}</span>
+                </TableCell>
+                <TableCell><div className="font-black text-ink">{prod.stock}</div></TableCell>
+                <TableCell>
+                  <div className={`px-2 py-1 inline-flex rounded-md text-[12px] font-bold ${
+                    prod.status === 'Published' ? 'bg-[#f4fce3] text-[#65a30d]' :
+                    prod.status === 'Draft' ? 'bg-[#f8fafc] text-[#64748b] border border-[#cbd5e1]' :
+                    'bg-[#fef2f2] text-[#ef4444]'
+                  }`}>
+                    {prod.status}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <button className="text-[13px] font-[800] text-brand-green hover:underline cursor-pointer">
+                    View
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
             {filteredProducts.length === 0 && (
               <TableRow>
                 <TableCell><div className="p-8 text-center text-[#8a949d] font-semibold w-full block">No products found.</div></TableCell>
@@ -110,6 +98,7 @@ export function ProductsTab() {
           </Table>
           <Pagination
             currentPage={currentPage}
+            totalPages={totalPages}
             totalItems={filteredProducts.length}
             pageSize={pageSize}
             onPageChange={setCurrentPage}

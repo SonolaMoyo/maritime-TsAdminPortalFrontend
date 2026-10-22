@@ -229,6 +229,50 @@ class CatalogService {
       return newMedia;
     }
   }
+
+  async deleteMedia(id: string) {
+    try {
+      await apiFetch(`/catalog/media/${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('[CatalogService] API error deleting media, using local fallback:', err);
+    }
+    this.fallbackMedia = this.fallbackMedia.filter(m => m.id !== id);
+  }
+
+  async getSegmentContent(segment: string) {
+    try {
+      const response = await apiFetch<{
+        id: string;
+        segment: string;
+        title: string;
+        intro: string;
+        capabilities: string;
+        bannerImageUrl?: string;
+      }>(`/catalog/segments/${encodeURIComponent(segment)}/content`);
+      return response.data;
+    } catch (err) {
+      console.warn('[CatalogService] API error fetching segment content:', err);
+      return null;
+    }
+  }
+
+  async saveSegmentContent(segment: string, content: {
+    title: string;
+    intro: string;
+    capabilities: string;
+    bannerImageUrl?: string;
+  }) {
+    try {
+      const response = await apiFetch<any>(`/catalog/segments/${encodeURIComponent(segment)}/content`, {
+        method: 'PUT',
+        body: JSON.stringify(content),
+      });
+      return response.data;
+    } catch (err) {
+      console.warn('[CatalogService] API error saving segment content:', err);
+      return content;
+    }
+  }
 }
 
 export const catalogService = new CatalogService();

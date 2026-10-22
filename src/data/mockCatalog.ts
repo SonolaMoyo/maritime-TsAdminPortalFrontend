@@ -7,12 +7,15 @@ export interface CatalogProduct {
   shortDescription: string;
   description: string;
   segment: 'Solar Tech' | 'Luxe' | 'EV' | 'Electronics';
-  categoryId: string;
-  brandId: string;
+  categoryId?: string;
+  brandId?: string;
   status: ProductStatus;
   isFeatured: boolean;
   warrantyInformation: string;
   installationInformation: string;
+  specs?: ProductSpecification[];
+  images?: ProductImage[];
+  docs?: ProductDocument[];
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
@@ -38,29 +41,31 @@ export interface Brand {
 
 export interface ProductImage {
   id: string;
-  productId: string;
+  productId?: string;
   url: string;
   isPrimary: boolean;
-  displayOrder: number;
-  altText: string;
+  displayOrder?: number;
+  altText?: string;
 }
 
 export interface ProductSpecification {
   id: string;
-  productId: string;
+  productId?: string;
   groupName: string;
   name: string;
   value: string;
   unit?: string;
-  displayOrder: number;
+  displayOrder?: number;
 }
 
 export interface ProductDocument {
   id: string;
-  productId: string;
-  type: 'BROCHURE' | 'DATASHEET';
+  productId?: string;
+  type: string;
   name: string;
+  title?: string;
   fileUrl: string;
+  fileSize?: string;
   createdAt: string;
 }
 
