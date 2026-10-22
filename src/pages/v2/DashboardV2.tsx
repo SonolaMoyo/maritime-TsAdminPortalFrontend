@@ -1,12 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   ShoppingCart, Inbox, Package, Folder, ArrowUpRight, 
-  Calendar, TrendingUp, ChevronRight
+  Calendar, TrendingUp, ChevronRight, RotateCw, Loader2
 } from "lucide-react";
 import { Panel } from "../../components/ui/Card";
 import { Select } from "../../components/ui/Select";
 import { useSegment } from "../../context/SegmentContext";
+import { 
+  analyticsService, 
+  type OrdersStats, 
+  type InventoryStats, 
+  type RequestsStats, 
+  type CatalogStats 
+} from "../../services/analyticsService";
 
 // Months configuration
 const MONTHS = [
@@ -39,6 +46,14 @@ interface GraphProps {
 
 function MovementGraph({ data, color, fillGradient, unit = "" }: GraphProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-36 flex items-center justify-center text-xs text-[#8a949d] bg-[#fcfdfa] rounded-xl border border-line/60">
+        No trend records found for this timeframe
+      </div>
+    );
+  }
 
   const values = data.map(d => d.value);
   const maxVal = Math.max(...values, 1);
@@ -181,119 +196,106 @@ export function DashboardV2() {
   const [selectedYear, setSelectedYear] = useState<string>("2026");
   const [selectedMonth, setSelectedMonth] = useState<string>("10");
 
-  // Multiplier depending on selected period & segment to provide realistic dynamic movement
-  const periodMultiplier = useMemo(() => {
-    let base = 1.0;
-    if (selectedYear === "2025") base *= 0.82;
-    if (selectedYear === "2024") base *= 0.65;
-    if (selectedMonth === "all") base *= 10.5;
-    else {
-      const m = parseInt(selectedMonth, 10);
-      base *= (0.75 + (m % 5) * 0.12);
+  // Individual states for light, independent loading
+  const [ordersStats, setOrdersStats] = useState<OrdersStats | null>(null);
+  const [inventoryStats, setInventoryStats] = useState<InventoryStats | null>(null);
+  const [requestsStats, setRequestsStats] = useState<RequestsStats | null>(null);
+  const [catalogStats, setCatalogStats] = useState<CatalogStats | null>(null);
+
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingInventory, setLoadingInventory] = useState(false);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [loadingCatalog, setLoadingCatalog] = useState(false);
+
+  // 1. Fetch Orders calculation on-the-fly
+  const fetchOrders = useCallback(async () => {
+    setLoadingOrders(true);
+    try {
+      const data = await analyticsService.getOrdersStats({
+        year: selectedYear,
+        month: selectedMonth,
+        segment
+      });
+      setOrdersStats(data);
+    } catch (err) {
+      console.error("Orders stats error:", err);
+    } finally {
+      setLoadingOrders(false);
     }
-    if (segment !== "All") base *= 0.45;
-    return base;
   }, [selectedYear, selectedMonth, segment]);
 
-  // Dynamic Movement Data for the 4 features
-  const isAllMonths = selectedMonth === "all";
-
-  // 1. Orders Movement Data
-  const ordersData = useMemo(() => {
-    if (isAllMonths) {
-      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return labels.map((label, i) => {
-        const val = Math.round((14 + (i * 2.5) + (i % 3) * 4) * (periodMultiplier / 8));
-        return { label, value: Math.max(val, 2) };
+  // 2. Fetch Inventory calculation on-the-fly
+  const fetchInventory = useCallback(async () => {
+    setLoadingInventory(true);
+    try {
+      const data = await analyticsService.getInventoryStats({
+        year: selectedYear,
+        month: selectedMonth,
+        segment
       });
+      setInventoryStats(data);
+    } catch (err) {
+      console.error("Inventory stats error:", err);
+    } finally {
+      setLoadingInventory(false);
     }
-    return [
-      { label: "W1", value: Math.round(6 * periodMultiplier) },
-      { label: "W2", value: Math.round(9 * periodMultiplier) },
-      { label: "W3", value: Math.round(14 * periodMultiplier) },
-      { label: "W4", value: Math.round(18 * periodMultiplier) },
-    ];
-  }, [isAllMonths, periodMultiplier]);
+  }, [selectedYear, selectedMonth, segment]);
 
-  // 2. Requests Movement Data
-  const requestsData = useMemo(() => {
-    if (isAllMonths) {
-      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return labels.map((label, i) => {
-        const val = Math.round((22 + (i * 3) + ((i % 4) * 3)) * (periodMultiplier / 8));
-        return { label, value: Math.max(val, 4) };
+  // 3. Fetch Requests calculation on-the-fly
+  const fetchRequests = useCallback(async () => {
+    setLoadingRequests(true);
+    try {
+      const data = await analyticsService.getRequestsStats({
+        year: selectedYear,
+        month: selectedMonth,
+        segment
       });
+      setRequestsStats(data);
+    } catch (err) {
+      console.error("Requests stats error:", err);
+    } finally {
+      setLoadingRequests(false);
     }
-    return [
-      { label: "W1", value: Math.round(8 * periodMultiplier) },
-      { label: "W2", value: Math.round(12 * periodMultiplier) },
-      { label: "W3", value: Math.round(17 * periodMultiplier) },
-      { label: "W4", value: Math.round(23 * periodMultiplier) },
-    ];
-  }, [isAllMonths, periodMultiplier]);
+  }, [selectedYear, selectedMonth, segment]);
 
-  // 3. Inventory Movement Data
-  const inventoryData = useMemo(() => {
-    if (isAllMonths) {
-      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return labels.map((label, i) => {
-        const val = Math.round((180 + (i * 18) - ((i % 3) * 12)) * (periodMultiplier / 8));
-        return { label, value: Math.max(val, 50) };
+  // 4. Fetch Catalog calculation on-the-fly
+  const fetchCatalog = useCallback(async () => {
+    setLoadingCatalog(true);
+    try {
+      const data = await analyticsService.getCatalogStats({
+        year: selectedYear,
+        month: selectedMonth,
+        segment
       });
+      setCatalogStats(data);
+    } catch (err) {
+      console.error("Catalog stats error:", err);
+    } finally {
+      setLoadingCatalog(false);
     }
-    return [
-      { label: "W1", value: Math.round(210 * periodMultiplier) },
-      { label: "W2", value: Math.round(245 * periodMultiplier) },
-      { label: "W3", value: Math.round(290 * periodMultiplier) },
-      { label: "W4", value: Math.round(340 * periodMultiplier) },
-    ];
-  }, [isAllMonths, periodMultiplier]);
+  }, [selectedYear, selectedMonth, segment]);
 
-  // 4. Catalog Movement Data
-  const catalogData = useMemo(() => {
-    if (isAllMonths) {
-      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return labels.map((label, i) => {
-        const val = Math.round((12 + Math.floor(i * 1.5)) * (periodMultiplier > 1 ? 1.5 : 1));
-        return { label, value: Math.max(val, 6) };
-      });
-    }
-    return [
-      { label: "W1", value: Math.round(16 * (periodMultiplier > 1 ? 1.3 : 1)) },
-      { label: "W2", value: Math.round(18 * (periodMultiplier > 1 ? 1.3 : 1)) },
-      { label: "W3", value: Math.round(21 * (periodMultiplier > 1 ? 1.3 : 1)) },
-      { label: "W4", value: Math.round(24 * (periodMultiplier > 1 ? 1.3 : 1)) },
-    ];
-  }, [isAllMonths, periodMultiplier]);
+  // Trigger individual endpoint queries whenever period or segment changes
+  useEffect(() => {
+    fetchOrders();
+    fetchInventory();
+    fetchRequests();
+    fetchCatalog();
+  }, [fetchOrders, fetchInventory, fetchRequests, fetchCatalog]);
 
-  // High-level Stats calculated for period
-  const stats = useMemo(() => {
-    const totalOrderCount = ordersData.reduce((s, d) => s + d.value, 0);
-    const orderRevenue = Math.round(totalOrderCount * 285000);
-    const inFulfillment = Math.max(1, Math.round(totalOrderCount * 0.42));
-    const fulfilled = Math.max(0, totalOrderCount - inFulfillment);
-
-    const totalRequests = requestsData.reduce((s, d) => s + d.value, 0);
-    const wonRequests = Math.round(totalRequests * 0.48);
-    const activeRequests = totalRequests - wonRequests;
-    const requestPipelineValue = Math.round(totalRequests * 410000);
-
-    const totalStock = inventoryData[inventoryData.length - 1].value;
-    const healthyStockPct = 94;
-    const activeWarehouses = 4;
-    const incomingShipments = Math.round(3 * periodMultiplier) || 2;
-
-    const publishedProducts = catalogData[catalogData.length - 1].value;
-    const categoriesCount = segment === "All" ? 8 : 3;
-    const featuredItems = Math.min(publishedProducts, 6);
-
-    return {
-      orders: { total: totalOrderCount, revenue: orderRevenue, inFulfillment, fulfilled },
-      requests: { total: totalRequests, won: wonRequests, active: activeRequests, pipelineValue: requestPipelineValue },
-      inventory: { totalStock, healthPct: healthyStockPct, warehouses: activeWarehouses, incoming: incomingShipments },
-      catalog: { published: publishedProducts, categories: categoriesCount, featured: featuredItems }
+  // Listen to external refresh signals (e.g., when an order or receipt is created)
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchOrders();
+      fetchInventory();
+      fetchRequests();
+      fetchCatalog();
     };
-  }, [ordersData, requestsData, inventoryData, catalogData, periodMultiplier, segment]);
+    window.addEventListener("dashboard-refresh", handleRefresh);
+    return () => window.removeEventListener("dashboard-refresh", handleRefresh);
+  }, [fetchOrders, fetchInventory, fetchRequests, fetchCatalog]);
+
+  const isRefreshingAll = loadingOrders || loadingInventory || loadingRequests || loadingCatalog;
 
   return (
     <div className="p-4 sm:p-6 max-w-[1400px] mx-auto w-full space-y-4 sm:space-y-6">
@@ -304,11 +306,11 @@ export function DashboardV2() {
             Dashboard {segment !== "All" && <span className="text-brand-green">— {segment}</span>}
           </h1>
           <p className="text-xs sm:text-sm text-[#5b6671] font-medium mt-1">
-            Real-time operations velocity, lead generation, inventory status, and catalog overview.
+            Real-time live calculated operations velocity, stock levels, lead generation, and catalog portfolio.
           </p>
         </div>
 
-        {/* Time Adjuster Bar (Month & Year Filter) */}
+        {/* Time Adjuster Bar (Month & Year Filter + Live Recalculate Button) */}
         <div className="w-full md:w-auto bg-white border border-line rounded-2xl p-2 sm:p-2.5 shadow-sm flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#8a949d] pl-1 sm:pl-2 uppercase tracking-wider">
             <Calendar className="w-4 h-4 text-brand-green flex-shrink-0" />
@@ -337,6 +339,23 @@ export function DashboardV2() {
             />
           </div>
 
+          {/* Recalculate Button */}
+          <button
+            type="button"
+            onClick={() => {
+              fetchOrders();
+              fetchInventory();
+              fetchRequests();
+              fetchCatalog();
+            }}
+            disabled={isRefreshingAll}
+            className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-brand-green hover:bg-[#eff5ed] transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            title="Recalculate live statistics directly from database"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${isRefreshingAll ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">Recalculate</span>
+          </button>
+
           {(selectedMonth !== "10" || selectedYear !== "2026") && (
             <button
               onClick={() => { setSelectedMonth("10"); setSelectedYear("2026"); }}
@@ -349,10 +368,14 @@ export function DashboardV2() {
         </div>
       </div>
 
-      {/* 4 Major Features Grid */}
+      {/* 4 Major Features Grid:
+          Layout Order:
+          Row 1: Orders (left)    | Inventory (right)
+          Row 2: Request (left)   | Catalog (right)
+      */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
-        {/* 1. ORDERS CARD & GRAPH */}
+        {/* 1. ORDERS CARD & GRAPH (Top Left) */}
         <div 
           onClick={() => navigate('/orders')}
           className="group cursor-pointer"
@@ -374,31 +397,44 @@ export function DashboardV2() {
                   </div>
                 </div>
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/orders'); }}
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
-                >
-                  <span className="hidden xs:inline">Open</span> Orders
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {loadingOrders && (
+                    <Loader2 className="w-4 h-4 animate-spin text-brand-green" />
+                  )}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); navigate('/orders'); }}
+                    className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
+                  >
+                    <span className="hidden xs:inline">Open</span> Orders
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* KPI Chips */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Orders</span>
-                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.orders.total}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">
+                    {ordersStats ? ordersStats.total : 0}
+                  </strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">Prepaid</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Paid Revenue</span>
-                  <strong className="text-lg sm:text-xl font-black text-brand-green truncate block">₦{stats.orders.revenue.toLocaleString()}</strong>
+                  <strong className="text-lg sm:text-xl font-black text-brand-green truncate block">
+                    ₦{(ordersStats ? ordersStats.revenue : 0).toLocaleString()}
+                  </strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Verified</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">In Fulfillment</span>
-                  <strong className="text-xl sm:text-2xl font-black text-blue-600">{stats.orders.inFulfillment}</strong>
-                  <span className="text-[11px] text-[#5b6671] block mt-0.5">{stats.orders.fulfilled} completed</span>
+                  <strong className="text-xl sm:text-2xl font-black text-blue-600">
+                    {ordersStats ? ordersStats.inFulfillment : 0}
+                  </strong>
+                  <span className="text-[11px] text-[#5b6671] block mt-0.5">
+                    {ordersStats ? ordersStats.fulfilled : 0} completed
+                  </span>
                 </div>
               </div>
 
@@ -409,10 +445,10 @@ export function DashboardV2() {
                     <TrendingUp className="w-3.5 h-3.5 text-brand-green flex-shrink-0" />
                     Order Volume Movement ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
-                  <span className="text-brand-green font-black flex-shrink-0">Active</span>
+                  <span className="text-brand-green font-black flex-shrink-0">Live Active</span>
                 </div>
                 <MovementGraph 
-                  data={ordersData} 
+                  data={ordersStats?.trend ?? []} 
                   color="#005642" 
                   fillGradient={["#005642", "#d2ff2f"]} 
                   unit=""
@@ -427,82 +463,7 @@ export function DashboardV2() {
           </Panel>
         </div>
 
-        {/* 2. REQUESTS CARD & GRAPH */}
-        <div 
-          onClick={() => navigate('/requests')}
-          className="group cursor-pointer"
-        >
-          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
-            <div>
-              {/* Header with Direct Redirect */}
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f2f7ef] text-brand-green flex items-center justify-center shadow-sm">
-                    <Inbox className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
-                      Requests
-                      <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h2>
-                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial quotes, inquiries & win rate</p>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/requests'); }}
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
-                >
-                  <span className="hidden xs:inline">Open</span> Requests
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* KPI Chips */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
-                <div>
-                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Quotes</span>
-                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.requests.total}</strong>
-                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Inquiries</span>
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Deals Won</span>
-                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.requests.won}</strong>
-                  <span className="text-[11px] text-brand-green font-bold block mt-0.5">48% Win Rate</span>
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">In Negotiation</span>
-                  <strong className="text-xl sm:text-2xl font-black text-[#996600]">{stats.requests.active}</strong>
-                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Active Leads</span>
-                </div>
-              </div>
-
-              {/* Movement Graph */}
-              <div>
-                <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
-                  <span className="flex items-center gap-1.5 truncate">
-                    <TrendingUp className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
-                    Quote Request Inflow ({selectedMonth === "all" ? "Monthly" : "Weekly"})
-                  </span>
-                  <span className="text-blue-600 font-black flex-shrink-0">Momentum</span>
-                </div>
-                <MovementGraph 
-                  data={requestsData} 
-                  color="#0055cc" 
-                  fillGradient={["#0055cc", "#e6f0ff"]} 
-                  unit=""
-                />
-              </div>
-            </div>
-
-            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
-              <span className="line-clamp-1">Pipeline: New &bull; Contacted &bull; Quote Sent &bull; Won</span>
-              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Requests &rarr;</span>
-            </div>
-          </Panel>
-        </div>
-
-        {/* 3. INVENTORY CARD & GRAPH */}
+        {/* 2. INVENTORY CARD & GRAPH (Top Right) */}
         <div 
           onClick={() => navigate('/inventory')}
           className="group cursor-pointer"
@@ -524,31 +485,44 @@ export function DashboardV2() {
                   </div>
                 </div>
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/inventory'); }}
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
-                >
-                  <span className="hidden xs:inline">Open</span> Inventory
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {loadingInventory && (
+                    <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                  )}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); navigate('/inventory'); }}
+                    className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
+                  >
+                    <span className="hidden xs:inline">Open</span> Inventory
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* KPI Chips */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Stock Units</span>
-                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.inventory.totalStock}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">
+                    {inventoryStats ? inventoryStats.totalStock : 0}
+                  </strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Across Hubs</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Stock Health</span>
-                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.inventory.healthPct}%</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">
+                    {inventoryStats ? inventoryStats.healthPct : 100}%
+                  </strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">Optimal</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Warehouses</span>
-                  <strong className="text-xl sm:text-2xl font-black text-purple-700">{stats.inventory.warehouses}</strong>
-                  <span className="text-[11px] text-[#5b6671] block mt-0.5">{stats.inventory.incoming} Inbound</span>
+                  <strong className="text-xl sm:text-2xl font-black text-purple-700">
+                    {inventoryStats ? inventoryStats.warehouses : 0}
+                  </strong>
+                  <span className="text-[11px] text-[#5b6671] block mt-0.5">
+                    {inventoryStats ? inventoryStats.incoming : 0} Inbound
+                  </span>
                 </div>
               </div>
 
@@ -557,12 +531,12 @@ export function DashboardV2() {
                 <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
                   <span className="flex items-center gap-1.5 truncate">
                     <TrendingUp className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
-                    Stock Availability ({selectedMonth === "all" ? "Monthly" : "Weekly"})
+                    Stock Movement ({selectedMonth === "all" ? "Monthly" : "Weekly"})
                   </span>
                   <span className="text-purple-600 font-black flex-shrink-0">Throughput</span>
                 </div>
                 <MovementGraph 
-                  data={inventoryData} 
+                  data={inventoryStats?.trend ?? []} 
                   color="#6b46c1" 
                   fillGradient={["#6b46c1", "#faf5ff"]} 
                   unit=""
@@ -571,13 +545,101 @@ export function DashboardV2() {
             </div>
 
             <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
-              <span className="line-clamp-1">Logistics: Hubs &bull; Transfers &bull; Receipts &bull; Suppliers</span>
+              <span className="line-clamp-1">Logistics: Hubs &bull; Transfers &bull; Receipts &bull; Stocking</span>
               <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Inventory &rarr;</span>
             </div>
           </Panel>
         </div>
 
-        {/* 4. CATALOG CARD & GRAPH */}
+        {/* 3. REQUESTS CARD & GRAPH (Bottom Left) */}
+        <div 
+          onClick={() => navigate('/requests')}
+          className="group cursor-pointer"
+        >
+          <Panel className="h-full border border-line hover:border-brand-green hover:shadow-lg transition-all rounded-2xl p-4 sm:p-6 bg-white relative flex flex-col justify-between">
+            <div>
+              {/* Header with Direct Redirect */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#eff5ed] to-[#f2f7ef] text-brand-green flex items-center justify-center shadow-sm">
+                    <Inbox className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-ink group-hover:text-brand-green transition-colors flex items-center gap-2">
+                      Requests
+                      <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </h2>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial quotes, inquiries & win rate</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {loadingRequests && (
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                  )}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); navigate('/requests'); }}
+                    className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
+                  >
+                    <span className="hidden xs:inline">Open</span> Requests
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Chips */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
+                <div>
+                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Total Quotes</span>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">
+                    {requestsStats ? requestsStats.total : 0}
+                  </strong>
+                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Inquiries</span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Deals Won</span>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">
+                    {requestsStats ? requestsStats.won : 0}
+                  </strong>
+                  <span className="text-[11px] text-brand-green font-bold block mt-0.5">
+                    {requestsStats ? requestsStats.winRate : 0}% Win Rate
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">In Negotiation</span>
+                  <strong className="text-xl sm:text-2xl font-black text-[#996600]">
+                    {requestsStats ? requestsStats.active : 0}
+                  </strong>
+                  <span className="text-[11px] text-[#5b6671] block mt-0.5">Active Leads</span>
+                </div>
+              </div>
+
+              {/* Movement Graph */}
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold text-[#5b6671] mb-2 px-1">
+                  <span className="flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                    Quote Request Inflow ({selectedMonth === "all" ? "Monthly" : "Weekly"})
+                  </span>
+                  <span className="text-blue-600 font-black flex-shrink-0">Momentum</span>
+                </div>
+                <MovementGraph 
+                  data={requestsStats?.trend ?? []} 
+                  color="#0055cc" 
+                  fillGradient={["#0055cc", "#e6f0ff"]} 
+                  unit=""
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
+              <span className="line-clamp-1">Pipeline: New &bull; Contacted &bull; Quote Sent &bull; Won</span>
+              <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Requests &rarr;</span>
+            </div>
+          </Panel>
+        </div>
+
+        {/* 4. CATALOG CARD & GRAPH (Bottom Right) */}
         <div 
           onClick={() => navigate('/catalog')}
           className="group cursor-pointer"
@@ -595,34 +657,45 @@ export function DashboardV2() {
                       Catalog
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h2>
-                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial product portfolio & brands</p>
+                    <p className="text-[11px] sm:text-xs text-[#5b6671] font-medium">Commercial product portfolio & segments</p>
                   </div>
                 </div>
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); navigate('/catalog'); }}
-                  className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
-                >
-                  <span className="hidden xs:inline">Open</span> Catalog
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {loadingCatalog && (
+                    <Loader2 className="w-4 h-4 animate-spin text-brand-orange" />
+                  )}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); navigate('/catalog'); }}
+                    className="px-3 sm:px-3.5 py-1.5 rounded-full bg-[#f4f7f5] group-hover:bg-brand-green group-hover:text-white text-ink text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
+                  >
+                    <span className="hidden xs:inline">Open</span> Catalog
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* KPI Chips */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-5 sm:mb-6 bg-[#fcfdfa] p-3 sm:p-3.5 rounded-xl border border-line">
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Products</span>
-                  <strong className="text-xl sm:text-2xl font-black text-ink">{stats.catalog.published}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-ink">
+                    {catalogStats ? catalogStats.published : 0}
+                  </strong>
                   <span className="text-[11px] text-brand-green font-bold block mt-0.5">Published</span>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Categories</span>
-                  <strong className="text-xl sm:text-2xl font-black text-brand-green">{stats.catalog.categories}</strong>
+                  <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Segments</span>
+                  <strong className="text-xl sm:text-2xl font-black text-brand-green">
+                    {catalogStats ? catalogStats.categories : 0}
+                  </strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Active Lines</span>
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-[#8a949d] uppercase block">Featured</span>
-                  <strong className="text-xl sm:text-2xl font-black text-amber-600">{stats.catalog.featured}</strong>
+                  <strong className="text-xl sm:text-2xl font-black text-amber-600">
+                    {catalogStats ? catalogStats.featured : 0}
+                  </strong>
                   <span className="text-[11px] text-[#5b6671] block mt-0.5">Showcase</span>
                 </div>
               </div>
@@ -637,7 +710,7 @@ export function DashboardV2() {
                   <span className="text-brand-orange font-black flex-shrink-0">Expansion</span>
                 </div>
                 <MovementGraph 
-                  data={catalogData} 
+                  data={catalogStats?.trend ?? []} 
                   color="#f29a3b" 
                   fillGradient={["#f29a3b", "#fff8e6"]} 
                   unit=""
@@ -646,69 +719,13 @@ export function DashboardV2() {
             </div>
 
             <div className="pt-3 sm:pt-4 mt-2 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs text-[#8a949d]">
-              <span className="line-clamp-1">Content: Products &bull; Categories &bull; Featured &bull; Media</span>
+              <span className="line-clamp-1">Content: Products &bull; Segments &bull; Featured &bull; Media</span>
               <span className="font-bold text-brand-green group-hover:underline flex-shrink-0">Explore Catalog &rarr;</span>
             </div>
           </Panel>
         </div>
 
       </div>
-
-      {/* Quick Direct Navigation Bar */}
-      {/* <div className="bg-white border border-line rounded-2xl p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-black text-[#8a949d] uppercase tracking-wider">
-            Direct Operations Navigation
-          </h3>
-          <span className="text-xs text-[#5b6671] font-medium">Quick switch to any major module</span>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button
-            onClick={() => navigate('/orders')}
-            className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
-          >
-            <div>
-              <div className="text-sm font-bold text-ink group-hover:text-brand-green">Orders Portal</div>
-              <div className="text-[11px] text-[#5b6671]">Fulfillment & dispatch</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-[#8a949d] group-hover:text-brand-green group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => navigate('/requests')}
-            className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
-          >
-            <div>
-              <div className="text-sm font-bold text-ink group-hover:text-brand-green">Quote Requests</div>
-              <div className="text-[11px] text-[#5b6671]">Customer inquiries & leads</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-[#8a949d] group-hover:text-brand-green group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => navigate('/inventory')}
-            className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
-          >
-            <div>
-              <div className="text-sm font-bold text-ink group-hover:text-brand-green">Stock & Inventory</div>
-              <div className="text-[11px] text-[#5b6671]">Warehouses & shipments</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-[#8a949d] group-hover:text-brand-green group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          <button
-            onClick={() => navigate('/catalog')}
-            className="p-3.5 rounded-xl border border-line bg-[#fcfdfa] hover:bg-[#eff5ed] hover:border-brand-green text-left transition-all flex items-center justify-between cursor-pointer group"
-          >
-            <div>
-              <div className="text-sm font-bold text-ink group-hover:text-brand-green">Product Catalog</div>
-              <div className="text-[11px] text-[#5b6671]">Showcase & categories</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-[#8a949d] group-hover:text-brand-green group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-      </div> */}
     </div>
   );
 }

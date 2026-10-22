@@ -1,4 +1,5 @@
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Menu } from "lucide-react";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 interface TopbarProps {
   onToggleMobileMenu?: () => void;
@@ -32,12 +33,7 @@ export function Topbar({ onToggleMobileMenu }: TopbarProps) {
 
       {/* Right side: Bell & User Info */}
       <div className="flex items-center gap-2.5 sm:gap-3 text-[#66727b] font-[750] whitespace-nowrap text-sm flex-shrink-0">
-        <span className="relative w-8 h-8 sm:w-9 sm:h-9 border border-[#dce5da] rounded-full grid place-items-center bg-white cursor-pointer hover:bg-[#f8faf9] transition-colors">
-          <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-ink" />
-          <i className="absolute -right-1 -top-1.5 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] rounded-full bg-[#e53e3e] text-white text-[10px] sm:text-[11px] grid place-items-center font-black not-italic">
-            2
-          </i>
-        </span>
+        <NotificationDropdown />
         <div className="hidden sm:flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-brand-green/10 text-brand-green font-black text-xs flex items-center justify-center border border-brand-green/20">
             AD
