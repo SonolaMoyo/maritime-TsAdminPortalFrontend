@@ -12,6 +12,7 @@ export interface SelectOption {
 export interface SelectProps {
   options: Array<SelectOption | string>;
   value?: string;
+  defaultValue?: any;
   onChange: (value: string) => void;
   placeholder?: string;
   searchable?: boolean;

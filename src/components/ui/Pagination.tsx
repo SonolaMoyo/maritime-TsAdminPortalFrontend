@@ -4,6 +4,7 @@ import { cn } from "../../utils/utils";
 interface PaginationProps {
   currentPage: number;
   totalItems: number;
+  totalPages?: number;
   pageSize?: number;
   onPageChange: (page: number) => void;
   className?: string;
@@ -12,11 +13,13 @@ interface PaginationProps {
 export function Pagination({
   currentPage,
   totalItems,
+  totalPages: propTotalPages,
   pageSize = 5,
   onPageChange,
   className
 }: PaginationProps) {
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const calculatedPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalPages = propTotalPages !== undefined ? propTotalPages : calculatedPages;
   const from = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const to = Math.min(totalItems, currentPage * pageSize);
 

@@ -26,13 +26,13 @@ export function IncomingTab() {
           {receipts.map((rec) => (
             <TableRow key={rec.id} className="cursor-pointer hover:bg-[#fcfdfa]">
               <TableCell><div className="font-bold text-ink">{rec.referenceNumber}</div></TableCell>
-              <TableCell><div className="font-bold text-[#5b6671] text-[14px]">Supplier {rec.supplierId.replace('sup-', '#')}</div></TableCell>
+              <TableCell><div className="font-bold text-[#5b6671] text-[14px]">Supplier {(rec.supplierId ? rec.supplierId.replace('sup-', '#') : 'N/A')}</div></TableCell>
               <TableCell>
                 <div className="text-[14px] text-ink font-medium max-w-[200px] truncate">
-                  {rec.items.map(i => i.productName).join(", ")}
+                  {(rec.items || []).map(i => i.productName).join(", ")}
                 </div>
               </TableCell>
-              <TableCell><div className="font-black text-ink">{rec.items.reduce((s, i) => s + i.expectedQuantity, 0)}</div></TableCell>
+              <TableCell><div className="font-black text-ink">{(rec.items || []).reduce((s, i) => s + i.expectedQuantity, 0)}</div></TableCell>
               <TableCell>
                 <div className="text-[14px] font-medium text-ink">
                   {rec.warehouseId === "wh-1" ? "Lagos Warehouse" : "Abuja Hub"}
@@ -40,7 +40,7 @@ export function IncomingTab() {
               </TableCell>
               <TableCell>
                 <div className="text-[14px] font-medium text-ink">
-                  {new Date(rec.expectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                  {(rec.expectedDate ? new Date(rec.expectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'N/A')}
                 </div>
               </TableCell>
               <TableCell>

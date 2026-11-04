@@ -1,4 +1,9 @@
-export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5050/api/v1';
+const envUrl = (import.meta as any).env?.VITE_API_BASE_URL;
+export const API_BASE_URL = (envUrl && !envUrl.includes('localhost'))
+  ? envUrl
+  : (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+    ? `${window.location.protocol}//api.${window.location.hostname.replace(/^(admin|www)\./, '')}/api/v1`
+    : (envUrl || 'http://localhost:5050/api/v1');
 
 export interface ApiResponse<T> {
   success: boolean;

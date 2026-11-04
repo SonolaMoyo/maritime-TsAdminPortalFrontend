@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { catalogService } from "../../services/catalogService";
 import type { MediaAsset } from "../../data/mockCatalog";
 import { Table, TableRow, TableCell } from "../ui/Table";
-import { Plus, Image as ImageIcon, FileText, Download, Trash2, Eye, UploadCloud, AlertCircle } from "lucide-react";
+import { Plus, FileText, Download, Trash2, Eye, UploadCloud, AlertCircle } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Pagination } from "../ui/Pagination";
 import { fileToBase64, validateFileSize, formatFileSize, downloadBase64File } from "../../utils/fileUtils";
