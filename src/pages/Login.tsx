@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Lock, Loader2, AlertCircle } from "lucide-react";
+import { Lock, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -8,8 +8,9 @@ export function Login() {
   const location = useLocation();
   const { login, isAuthenticated } = useAuth();
 
-  const [email, setEmail] = useState("admin@maritamatrading.com");
-  const [password, setPassword] = useState("Admin@123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,8 +45,8 @@ export function Login() {
           <Lock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         </div>
         
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink mb-2">Welcome back</h1>
-        <p className="text-sm sm:text-base text-text mb-6 sm:mb-8">Sign in to your Maritama Trading Operations account.</p>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-ink mb-2">Welcome</h1>
+        <p className="text-sm sm:text-base text-text mb-6 sm:mb-8">Sign in to your account.</p>
         
         {error && (
           <div className="mb-4 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium text-left flex items-start gap-2.5">
@@ -63,7 +64,7 @@ export function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. admin@maritamatrading.com"
+              placeholder="email"
               className="w-full h-12 px-4 rounded-xl border border-[#dce5da] bg-bg focus:bg-white focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
             />
           </div>
@@ -71,17 +72,38 @@ export function Login() {
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="block text-sm font-bold text-ink" htmlFor="password">Password</label>
-              <span className="text-xs text-[#8a949d]">Admin Portal Access</span>
+              <button 
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-xs font-bold text-brand-green hover:text-brand-green2 transition-colors cursor-pointer flex items-center gap-1 focus:outline-none"
+              >
+                {showPassword ? "" : ""}
+              </button>
             </div>
-            <input 
-              id="password"
-              type="password" 
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full h-12 px-4 rounded-xl border border-[#dce5da] bg-bg focus:bg-white focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
-            />
+            <div className="relative">
+              <input 
+                id="password"
+                type={showPassword ? "text" : "password"} 
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full h-12 pl-4 pr-12 rounded-xl border border-[#dce5da] bg-bg focus:bg-white focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a949d] hover:text-ink transition-colors p-1.5 rounded-lg focus:outline-none cursor-pointer"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
           
           <button 
@@ -93,9 +115,6 @@ export function Login() {
           </button>
         </form>
         
-        <div className="mt-8 text-xs text-[#8a949d] border-t border-[#f0f4ee] pt-4">
-          <p>Protected operations environment. Active authentication required.</p>
-        </div>
       </div>
     </div>
   );
