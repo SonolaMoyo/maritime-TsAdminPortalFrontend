@@ -1,11 +1,18 @@
 import { Search, Menu } from "lucide-react";
 import { NotificationDropdown } from "./NotificationDropdown";
+import { useAuth } from "../../context/AuthContext";
 
 interface TopbarProps {
   onToggleMobileMenu?: () => void;
 }
 
 export function Topbar({ onToggleMobileMenu }: TopbarProps) {
+  const { user } = useAuth();
+
+  const initials = user?.name 
+    ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'AD';
+
   return (
     <header className="sticky top-0 z-30 min-h-[64px] sm:min-h-[74px] px-3.5 sm:px-5.5 py-2.5 bg-white/95 backdrop-blur-[16px] border-b border-[#dce5da] flex items-center justify-between gap-3">
       {/* Left side: Hamburger button + Search */}
@@ -34,11 +41,14 @@ export function Topbar({ onToggleMobileMenu }: TopbarProps) {
       {/* Right side: Bell & User Info */}
       <div className="flex items-center gap-2.5 sm:gap-3 text-[#66727b] font-[750] whitespace-nowrap text-sm flex-shrink-0">
         <NotificationDropdown />
-        <div className="hidden sm:flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-brand-green/10 text-brand-green font-black text-xs flex items-center justify-center border border-brand-green/20">
-            AD
+        <div className="flex items-center gap-2.5 pl-1.5 border-l border-line/60">
+          <div className="w-8 h-8 rounded-full bg-brand-green/10 text-brand-green font-black text-xs flex items-center justify-center border border-brand-green/20 flex-shrink-0">
+            {initials}
           </div>
-          <span className="hidden md:inline text-ink text-sm">Admin · Operations</span>
+          <div className="hidden md:flex flex-col text-left">
+            <span className="text-ink text-sm font-bold leading-tight">{user?.name || "Operations User"}</span>
+            <span className="text-[#8a949d] text-[11px] font-semibold">{user?.role || "Staff"}</span>
+          </div>
         </div>
       </div>
     </header>

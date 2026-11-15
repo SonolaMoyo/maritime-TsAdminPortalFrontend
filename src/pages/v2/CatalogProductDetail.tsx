@@ -38,6 +38,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
   const docInputRef = useRef<HTMLInputElement>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [docError, setDocError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Preview modals
   const [previewImage, setPreviewImage] = useState<ProductImage | null>(null);
@@ -85,6 +86,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
 
   const handleSave = async (status: 'Draft' | 'Published') => {
     setSaving(true);
+    setSaveError(null);
     try {
       const dataToSave = { 
         ...form, 
@@ -102,8 +104,9 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
         await catalogService.updateProduct(id, dataToSave as any);
         navigate("/catalog");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save product error:", err);
+      setSaveError(err.message || "Failed to save product. Please check required fields and try again.");
     } finally {
       setSaving(false);
     }
@@ -254,6 +257,21 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
           </button>
         </div>
       </div>
+
+      {saveError && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold">Error:</span> {saveError}
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setSaveError(null)}
+            className="text-red-500 hover:text-red-700 font-bold ml-4 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="space-y-6 sm:space-y-8">
         {/* 1. Basic Info */}

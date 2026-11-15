@@ -35,7 +35,7 @@ export async function apiFetch<T>(
   }
 
   // Token retrieval if stored
-  const token = localStorage.getItem('maritama_token');
+  const token = localStorage.getItem('auth_token') || localStorage.getItem('maritama_token');
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`);
   }
@@ -45,10 +45,24 @@ export async function apiFetch<T>(
     headers,
   });
 
-  const json: ApiResponse<T> = await response.json();
+  if (response.status === 401) {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('maritama_token');
+    localStorage.removeItem('maritime_user');
+    if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+      window.location.href = '/login';
+    }
+  }
+
+  let json: ApiResponse<T>;
+  try {
+    json = await response.json();
+  } catch {
+    throw new Error(`Request failed with status ${response.status}: ${response.statusText || 'Unable to parse server response'}`);
+  }
 
   if (!response.ok || json.success === false) {
-    const errorMsg = json.error?.message || `Request failed with status ${response.status}`;
+    const errorMsg = json.error?.message || json.message || `Request failed with status ${response.status}`;
     throw new Error(errorMsg);
   }
 

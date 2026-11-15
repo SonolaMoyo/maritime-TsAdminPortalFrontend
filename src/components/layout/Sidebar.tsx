@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useSegment } from "../../context/SegmentContext";
 import type { ExtendedSegmentType } from "../../context/SegmentContext";
+import { useAuth } from "../../context/AuthContext";
 import { Select } from "../ui/Select";
 
 interface SidebarProps {
@@ -27,8 +28,19 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { segment, setSegment } = useSegment();
+  const { user, logout } = useAuth();
   // By default in full screen (desktop) it is collapsed with icons showing
   const [isCollapsed, setIsCollapsed] = useState(true);
+
+  const initials = user?.name 
+    ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'AD';
+
+  const handleLogout = () => {
+    if (onClose) onClose();
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
     { 
@@ -196,16 +208,13 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         <div className="border-t border-[#e4ece2] p-2.5 flex flex-col items-center gap-2">
           <div 
             className="w-9 h-9 rounded-full bg-brand-green/10 text-brand-green font-black text-xs flex items-center justify-center border border-brand-green/20"
-            title="Admin · Administrator"
+            title={`${user?.name || "Admin"} · ${user?.role || "Administrator"}`}
           >
-            AD
+            {initials}
           </div>
           <button 
             type="button"
-            onClick={() => {
-              if (onClose) onClose();
-              navigate('/login');
-            }}
+            onClick={handleLogout}
             title="Sign out"
             className="w-9 h-9 rounded-xl border border-line bg-white flex items-center justify-center text-[#8a949d] hover:text-[#ef4444] hover:bg-[#fef2f2] transition-colors cursor-pointer"
           >
@@ -215,16 +224,13 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       ) : (
         <div className="border-t border-[#e4ece2] p-4 grid gap-2.5">
           <div>
-            <strong className="block text-ink truncate">Admin</strong>
-            <span className="block text-[#8a949d] text-[13px] truncate">Administrator</span>
+            <strong className="block text-ink truncate">{user?.name || "Operations User"}</strong>
+            <span className="block text-[#8a949d] text-[13px] truncate">{user?.role || "Administrator"}</span>
           </div>
           <button 
             type="button"
-            onClick={() => {
-              if (onClose) onClose();
-              navigate('/login');
-            }}
-            className="h-[40px] px-4 rounded-full border border-line bg-white font-[800] text-sm hover:-translate-y-0.5 transition-transform shadow-sm cursor-pointer flex items-center justify-center gap-2"
+            onClick={handleLogout}
+            className="h-[40px] px-4 rounded-full border border-line bg-white font-[800] text-sm hover:-translate-y-0.5 transition-transform shadow-sm cursor-pointer flex items-center justify-center gap-2 text-ink hover:text-[#ef4444]"
           >
             <LogOut className="w-4 h-4 text-[#8a949d]" />
             <span>Sign out</span>

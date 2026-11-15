@@ -18,48 +18,53 @@ export interface UserAccount {
 
 class RolesService {
   async getRoles(): Promise<Role[]> {
-    try {
-      const response = await apiFetch<Role[]>('/roles');
-      return response.data;
-    } catch (err) {
-      console.warn('[RolesService] Fallback to default roles:', err);
-      return [
-        {
-          id: 'role-1',
-          name: 'Super Admin',
-          description: 'Full system control, administrative oversight, and configuration access.',
-          permissions: ['all'],
-          userCount: 2,
-        },
-        {
-          id: 'role-2',
-          name: 'Sales Manager',
-          description: 'Manage quotes, orders, discounts, and customer billing communication.',
-          permissions: ['orders.read', 'orders.write', 'requests.write', 'catalog.read'],
-          userCount: 4,
-        },
-        {
-          id: 'role-3',
-          name: 'Warehouse Operator',
-          description: 'Inventory adjustment, batch tracking, dispatch confirmation.',
-          permissions: ['inventory.read', 'inventory.write', 'orders.read'],
-          userCount: 6,
-        },
-      ];
-    }
+    const response = await apiFetch<Role[]>('/roles');
+    return response.data || [];
   }
 
   async getUsers(): Promise<UserAccount[]> {
-    try {
-      const response = await apiFetch<UserAccount[]>('/roles/users');
-      return response.data;
-    } catch (err) {
-      console.warn('[RolesService] Fallback to default users:', err);
-      return [
-        { id: 'usr-1', name: 'Alhaji Musa Danjuma', email: 'admin@maritamatrading.com', role: 'Super Admin', status: 'Active' },
-        { id: 'usr-2', name: 'Ngozi Okafor', email: 'sales.head@maritamatrading.com', role: 'Sales Manager', status: 'Active' },
-      ];
-    }
+    const response = await apiFetch<UserAccount[]>('/users');
+    return response.data || [];
+  }
+
+  async createUser(user: Partial<UserAccount> & { password?: string }): Promise<UserAccount> {
+    const response = await apiFetch<UserAccount>('/users', {
+      method: 'POST',
+      body: JSON.stringify(user),
+    });
+    return response.data;
+  }
+
+  async updateUser(id: string, updates: Partial<UserAccount>): Promise<UserAccount> {
+    const response = await apiFetch<UserAccount>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+    return response.data;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await apiFetch(`/users/${id}`, { method: 'DELETE' });
+  }
+
+  async createRole(role: Partial<Role>): Promise<Role> {
+    const response = await apiFetch<Role>('/roles', {
+      method: 'POST',
+      body: JSON.stringify(role),
+    });
+    return response.data;
+  }
+
+  async updateRole(id: string, updates: Partial<Role>): Promise<Role> {
+    const response = await apiFetch<Role>(`/roles/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+    return response.data;
+  }
+
+  async deleteRole(id: string): Promise<void> {
+    await apiFetch(`/roles/${id}`, { method: 'DELETE' });
   }
 }
 
