@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { SegmentProvider } from "./context/SegmentContext";
 import { MainLayout } from "./components/layout/MainLayout";
 import { Login } from "./pages/Login";
+import { ResetPassword } from "./pages/ResetPassword";
 
 // Primary Portal Pages (V2 Architecture)
 import { DashboardV2 } from "./pages/v2/DashboardV2";
@@ -24,6 +25,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Enforce authentication on all admin portal routes */}
             <Route element={<ProtectedRoute><MainLayout><Outlet /></MainLayout></ProtectedRoute>}>
