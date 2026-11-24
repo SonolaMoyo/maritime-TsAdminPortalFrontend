@@ -24,6 +24,7 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
     segment: "Solar Tech",
     status: "Draft",
     isFeatured: false,
+    price: 0,
     warrantyInformation: "",
     installationInformation: ""
   });
@@ -320,6 +321,19 @@ export function CatalogProductDetail({ isNew = false }: { isNew?: boolean }) {
                 className="w-full border border-line rounded-xl px-4 py-3 text-[14px] focus:outline-brand-green font-semibold text-ink bg-[#fcfdfa]" 
                 placeholder="Product name populated from inventory" 
               />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-[13px] font-bold text-ink mb-2">Unit Price (₦) *</label>
+              <input 
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.price !== undefined ? form.price : ""} 
+                onChange={e => setForm({...form, price: parseFloat(e.target.value) || 0})} 
+                className="w-full border border-line rounded-xl px-4 py-3 text-[14px] focus:outline-brand-green font-semibold text-ink bg-[#fcfdfa]" 
+                placeholder="e.g. 2500000" 
+              />
+              <p className="text-[12px] text-[#8a949d] mt-1.5 font-medium">Standard selling price displayed across the public catalog and used in website checkout calculations.</p>
             </div>
             <div>
               <label className="block text-[13px] font-bold text-ink mb-2">Short Description</label>
