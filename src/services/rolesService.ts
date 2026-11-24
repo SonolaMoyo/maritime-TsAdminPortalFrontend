@@ -13,7 +13,10 @@ export interface UserAccount {
   name: string;
   email: string;
   role: string;
-  status: string;
+  status: 'Active' | 'Inactive' | string;
+  lastActive?: string;
+  created?: string;
+  createdAt?: string;
 }
 
 class RolesService {
@@ -22,8 +25,13 @@ class RolesService {
     return response.data || [];
   }
 
-  async getUsers(): Promise<UserAccount[]> {
-    const response = await apiFetch<UserAccount[]>('/users');
+  async getUsers(params?: { search?: string; role?: string; status?: string }): Promise<UserAccount[]> {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set('search', params.search);
+    if (params?.role) searchParams.set('role', params.role);
+    if (params?.status) searchParams.set('status', params.status);
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    const response = await apiFetch<UserAccount[]>(`/users${query}`);
     return response.data || [];
   }
 
