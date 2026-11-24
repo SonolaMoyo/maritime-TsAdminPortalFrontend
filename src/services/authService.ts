@@ -103,6 +103,22 @@ class AuthService {
     const user = this.getCurrentUser();
     return Boolean(token && user);
   }
+
+  async forgotPassword(email: string): Promise<string> {
+    const response = await apiFetch<any>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    return response.message || 'Password reset instructions have been sent to your email.';
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<string> {
+    const response = await apiFetch<any>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password: newPassword }),
+    });
+    return response.message || 'Password has been updated successfully.';
+  }
 }
 
 export const authService = new AuthService();
