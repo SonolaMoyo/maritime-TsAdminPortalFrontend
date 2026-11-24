@@ -11,6 +11,7 @@ export interface CatalogProduct {
   brandId?: string;
   status: ProductStatus;
   isFeatured: boolean;
+  price?: number;
   warrantyInformation: string;
   installationInformation: string;
   specs?: ProductSpecification[];
